@@ -1,4 +1,4 @@
-from flask import Flask, render_templates, request, redirect
+from flask import Flask, render_template, request
 import os, requests
 
 app = Flask(__name__)
