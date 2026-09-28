@@ -52,9 +52,10 @@
           <div style="font-size:11px;color:#888">No Expiry Instant</div>
           <div class="price">GHS {{b.price}}</div>
           <form action="/pay/{{b.id}}"
-          method="POST" style="margin:0">
-          <input type="hidden" name="phone" id="phone-{{b.id}}">
-          <button type="submit" onclick="return setData({{b.id}})"
+          method="POST" onsubmit="return fill(this,{{b.id}})" style="margin:0">
+          <input type="hidden" name="phone" id="p{{b.id}}">
+          <input type="hidden" name="email" id="e{{b.id}}">  
+          <button type="submit"
           style="width:100%; padding:12px; background:#0a66ff; color:#fff; border:0; border-radius:8px; font-weight:bold">Pay GHS {{b.price}}</button>
           </form>
        </div> 
@@ -88,21 +89,19 @@
        }
      </script>
      <script>
-       function setData(id){
+       function fill(f,id){
          let
-           p=document.getElementById('phone') ?
-           document.getElementById('phone').value:
-           document.getElementById('phoneInput').value:
+           p=document.getElementById('phoneMain').value ||
+           document.getElementById('phone').value;
          let
-           e=document.getElementById('email') ?
+           e=document.getElementById('emailMain').value ||
            document.getElementById('email').value:
-           document.getElementById('emailInput').value:
-         if(!p || p.length<10){alert('Enter phone');return false}
+         if(p.length<10){alert('Enter phone');return false}
          if(!e.includes(@)){alert('Enter email');return false}
 
-    document.getElementById('phone-'+id).value=p;
+    document.getElementById('p'+id).value=p;
 
-    document.getElementById('email-'+id).value=e;
+    document.getElementById('e'+id).value=e;
          return true;
        }
      </script>
