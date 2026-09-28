@@ -86,7 +86,26 @@
              });
              handler.openIframe();
        }
-     </script>                                                
+     </script>
+     <script>
+       function setData(id){
+         let
+           p=document.getElementById('phone') ?
+           document.getElementById('phone').value:
+           document.getElementById('phoneInput').value:
+         let
+           e=document.getElementById('email') ?
+           document.getElementById('email').value:
+           document.getElementById('emailInput').value:
+         if(!p || p.length<10){alert('Enter phone');return false}
+         if(!e.includes(@)){alert('Enter email');return false}
+
+    document.getElementById('phone-'+id).value=p;
+
+    document.getElementById('email-'+id).value=e;
+         return true;
+       }
+     </script>
 </body>
 </html>
          
