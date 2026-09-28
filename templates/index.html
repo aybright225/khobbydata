@@ -47,7 +47,6 @@
      <div class="grid">
      {% for b in bundles %}
        <div class="card">
-          <div class="mtn">{{b.network.upper() if b.network else 'MTN'}}</div>
           <div style="font-size:32px;font-weight:900;margin:6px 0;line-height:1;color:#666">{{b.network.upper()}}  {{b.gb or b.id}}GB</div>
           <div class="gb"{{b.gb or b.bundle}}</div>
           <div style="font-size:12px;color:#888">No Expiry Instant</div>
