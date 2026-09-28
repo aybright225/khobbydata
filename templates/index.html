@@ -52,7 +52,7 @@
           <div style="font-size:11px;color:#888">No Expiry Instant</div>
           <div class="price">GHS {{b.price}}</div>
           <form action="/pay/{{b.id}}"
-          method="POST" onsubmit="return fill(this,{{b.id}})" style="margin:0">
+          method="POST" onsubmit="return fill(this, {{b.id}})" style="margin:0">
           <input type="hidden" name="phone" id="p{{b.id}}">
           <input type="hidden" name="email" id="e{{b.id}}">  
           <button type="submit"
