@@ -44,8 +44,22 @@ def verify(bundle_id, reference):
             </div>
             """
     except Exeption as e:
-      print(e)
+    print(e)
     return '<h1>Payment Failed</h1><a href="/">Try Again</a>'
+
+@app.route("/pay/<int:bid>",
+methods=["POST"])
+def pay(bid):
+    phone = request.form.get("phone")
+    email = request.form.get("email")
+    bundle = next((b for b in BUNDLES
+if b["id"]==bid), None)
+    secret = os.getenv("PAYSTACK_SECRET_KEY")
+    r = request.post("https://api.paystack.co/transaction/initialize", json={"email": email, "amount": int(bundle["price"]*100), "currency":"GHS", "callback_url": f"{request.host_url}verify/{bid}/{phone}"}, headers={"Authorization":f"Bearer {secret}"})
+    data = r.json()
+    if data.get("status"):
+        return redirect(data["data"]["authorization_url"])
+    return f"Paystack Error: {data}"    
 
 if __name__=='__main__':
     port = int(os.environ.get("PORT",10000))
