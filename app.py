@@ -8,7 +8,7 @@
 *{margin:0;padding:0;box-sizing:border-box}
 body{background:#121212;font-family: -apple-system,BlinkMacSystemFont,sans-serif;color:#fff}
 .header{background:#2E6BFF;padding:14px 16px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:10}
-.logo{display:flex;align-items:center;gap:10px;font-weight:800;font-size:20px}
+.logo{display:flex;align-items:center;gap:10;font-weight:800;font-size:20px}
 .logo-k{background:#fff;color:#2E6BFF;width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:900}
 .tabs{display:flex;gap:8px;padding:14px;justify-content:center}
 .tab{padding:12px 22px;border-radius:14px;font-weight:700;border:none}
