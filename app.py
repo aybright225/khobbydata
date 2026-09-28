@@ -21,7 +21,7 @@ BUNDLES = [
 
 @app.route('/')
 def home():
-    return render_templates('index.html',
+    return render_template('index.html',
     bundles=BUNDLES,
     paystack_public=PAYSTACK_PUBLIC)
 
