@@ -67,27 +67,6 @@
        24/7 Automated Delivery
      <div>
 
-     <script src="https://js.paystack.co/v1/inline.js"></script>
-     <script>
-       function pay(id, price){
-         let
-           phone=document.getElementById('phone').value;
-           email=document.getElementById('email').value;
-             if(phone.length<10){alert('Enter data number');return;}
-             if(!email.includes('@')){alert('Enter email');return;}
-             var handler=PaystackPop.setup({
-               key:'{{paystack_public}}',
-               email:email,
-               amount:price*100,
-               currency:'GHS',
-               metadata:{phone:phone},
-               ref:'KHOBBY_'+Date.now(),
-               callback:function(res) {window.location.href='/verify/'+id+'/'+res.reference+'? phone='+phone},
-               onClose:function(){}
-             });
-             handler.openIframe();
-       }
-     </script>
      <script>
        function fill(f,id){
          let p=document.getElementById('phoneMain').value;
