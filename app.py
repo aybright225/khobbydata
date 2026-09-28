@@ -44,7 +44,7 @@ def verify(bundle_id, reference):
             </div>
             """
     except Exeption as e:
-    print(e)
+     print(e)
     return '<h1>Payment Failed</h1><a href="/">Try Again</a>'
 
 @app.route("/pay/<int:bid>",
