@@ -1,87 +1,105 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>KhobbyBryt Data</title>
-<style>
-*{margin:0;padding:0;box-sizing:border-box}
-body{background:#121212;font-family: -apple-system,BlinkMacSystemFont,sans-serif;color:#fff}
-.header{background:#2E6BFF;padding:14px 16px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:10}
-.logo{display:flex;align-items:center;gap:10;font-weight:800;font-size:20px}
-.logo-k{background:#fff;color:#2E6BFF;width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:900}
-.tabs{display:flex;gap:8px;padding:14px;justify-content:center}
-.tab{padding:12px 22px;border-radius:14px;font-weight:700;border:none}
-.tab.active{background:#FFC800;color:#000}
-.tab.inactive{background:#232323;color:#666}
-.info{display:flex;gap:18px;justify-content:center;color:#777;font-size:13px;padding-bottom:12px}
-.cards{padding:12px;max-width:500px;margin:0 auto}
-.card{background:#FFC800;border-radius:22px;padding:20px;margin-bottom:16px;color:#000}
-.top{display:flex;justify-content:space-between;align-items:center}
-.badge{border:1.5px solid #000;border-radius:20px;padding:3px 12px;font-size:10px;font-weight:800}
-.arrow{background:rgba(0,0,0,0.12);width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px}
-.gb{font-size:48px;font-weight:900;color:#fff;margin-top:28px;line-height:1;letter-spacing:-1px}
-.sub{font-size:14px;opacity:.8;margin-top:4px}
-.price-row{display:flex;justify-content:space-between;align-items:end;margin-top:24px}
-.price{font-size:36px;font-weight:900}
-.days{font-size:13px;opacity:.6}
-.buy{width:100%;margin-top:14px;padding:15px;background:#000;color:#FFC800;border:none;border-radius:12px;font-weight:800;font-size:16px;cursor:pointer}
-.wa{position:fixed;bottom:20px;right:20px;background:#25D366;width:56px;height:56px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:30px;text-decoration:none;z-index:99}
-</style>
-</head>
-<body>
+from flask import Flask, render_template, request, redirect
+import os
+import requests
+import time
 
-<div class="header">
-  <div class="logo"><div class="logo-k">K</div> KhobbyBryt</div>
-  <div style="font-size:22px">☀️ ☰</div>
-</div>
+app = Flask(__name__)
 
-<div class="tabs">
-  <button class="tab active">MTN</button>
-  <button class="tab inactive">AirtelTigo</button>
-  <button class="tab inactive">Telecel</button>
-</div>
+PAYSTACK_SECRET = os.environ.get("PAYSTACK_SECRET_KEY")
+PAYSTACK_PUBLIC = os.environ.get("PAYSTACK_PUBLIC_KEY")
 
-<div class="info">
-  <span>{{ bundles|length }} bundles</span>
-  <span>⚡ Fast delivery</span>
-  <span>🛡️ Secure</span>
-</div>
+DATAMART_API_KEY = "c3bb2d66891ca2dc895fd83acc484da89594b410071bb05911bf258ee515da97"
+DATAMART_BASE = "https://api.datamartgh.shop/api/developer"
 
-<div class="cards">
-{% for b in bundles %}
-<div class="card">
-  <div class="top">
-    <div class="badge">{{ b.network.upper() }}</div>
-    <div class="arrow">⌄</div>
-  </div>
-  <div class="gb">{{ b.data }}</div>
-  <div class="sub">{{ b.network.upper() }} Bundle</div>
-  <div class="price-row">
-    <div class="price">¢{{ b.price }}</div>
-    <div class="days">90 days</div>
-  </div>
-  <form action="/pay/{{ b.id }}" method="POST" onsubmit="return fill(this, {{ b.id }})">
-    <input type="hidden" name="phone" id="p{{ b.id }}">
-    <input type="hidden" name="email" id="e{{ b.id }}">
-    <button class="buy">Buy Now</button>
-  </form>
-</div>
-{% endfor %}
-</div>
+BUNDLES = [
+    {"id":1, "network":"mtn", "data":"1GB", "price":4.80},
+    {"id":2, "network":"mtn", "data":"2GB", "price":9.90},
+    {"id":3, "network":"mtn", "data":"3GB", "price":14.70},
+    {"id":4, "network":"mtn", "data":"4GB", "price":19.80},
+    {"id":5, "network":"mtn", "data":"5GB", "price":24.50},
+    {"id":6, "network":"mtn", "data":"6GB", "price":29.50},
+    {"id":7, "network":"mtn", "data":"7GB", "price":34.00},
+    {"id":8, "network":"mtn", "data":"8GB", "price":39.50},
+    {"id":9, "network":"mtn", "data":"9GB", "price":44.00},
+    {"id":10, "network":"mtn", "data":"10GB", "price":49.50}
+]
 
-<a href="https://wa.me/233559123456" class="wa">💬</a>
+def buy_from_datamart(phone, network, data_str):
+    try:
+        gb = int(data_str.replace("GB","").strip())
+        headers = {"X-API-Key": DATAMART_API_KEY, "Content-Type": "application/json"}
+        payload = {
+            "ref": f"khobby-{int(time.time())}",
+            "phone": phone,
+            "network": network.lower(),
+            "volume": gb
+        }
+        r = requests.post(f"{DATAMART_BASE}/purchase", json=payload, headers=headers, timeout=30)
+        return r.json()
+    except Exception as e:
+        return {"status": "error", "message": str(e)}
 
-<script>
-function fill(f,id){
-  let phone = prompt("Enter MTN number:");
-  if(!phone || phone.length < 10){ alert("Enter valid number"); return false; }
-  let email = prompt("Enter email (optional):") || "customer@khobby.com";
-  document.getElementById("p"+id).value = phone;
-  document.getElementById("e"+id).value = email;
-  return true;
-}
-</script>
+@app.route('/')
+def home():
+    return render_template('index.html', bundles=BUNDLES, paystack_public=PAYSTACK_PUBLIC)
 
-</body>
-</html>
+@app.route('/pay/<int:bid>', methods=["POST"])
+def pay(bid):
+    phone = request.form.get("phone")
+    email = request.form.get("email") or "customer@khobby.com"
+    bundle = next((b for b in BUNDLES if b["id"]==bid), None)
+    if not bundle:
+        return "Bundle not found", 404
+    if not phone:
+        return "Phone required", 400
+
+    amount = int(float(bundle["price"]) * 100)
+    headers = {"Authorization": f"Bearer {PAYSTACK_SECRET}", "Content-Type": "application/json"}
+    callback_url = f"{request.host_url}verify/{bundle['id']}/{phone}"
+    
+    data = {
+        "email": email,
+        "amount": amount,
+        "callback_url": callback_url,
+        "metadata": {"phone": phone, "bundle_id": bundle["id"], "bundle_data": bundle["data"]}
+    }
+    
+    r = requests.post("https://api.paystack.co/transaction/initialize", json=data, headers=headers)
+    j = r.json()
+    if j.get("status"):
+        return redirect(j["data"]["authorization_url"])
+    return f"Paystack Error: {j}"
+
+@app.route('/verify/<int:bundle_id>/<reference>')
+def verify(bundle_id, reference):
+    real_reference = request.args.get('reference', reference)
+    if real_reference == reference: 
+        phone = 'customer'
+    else:
+        phone = reference
+        reference = real_reference
+
+    headers = {"Authorization": f"Bearer {PAYSTACK_SECRET}"}
+    try:
+        r = requests.get(f"https://api.paystack.co/transaction/verify/{reference}", headers=headers)
+        data = r.json()
+        if data.get('status') and data['data']['status'] == 'success':
+            bundle = next((b for b in BUNDLES if b['id']==bundle_id), None)
+            if phone == 'customer':
+                phone = data['data']['metadata'].get('phone', phone)
+            result = buy_from_datamart(phone, bundle['network'], bundle['data'])
+            return f"""
+            <div style="font-family:Arial;text-align:center;padding:40px">
+            <h1 style="color:green">Payment Successful!</h1>
+            <h2>{bundle['data']} for {phone}</h2>
+            <p>Auto-delivery: {result}</p>
+            <a href="/">Back Home</a>
+            </div>
+            """
+    except Exception as e:
+        print(e)
+    return '<h1>Payment Failed</h1><a href="/">Try Again</a>'
+
+if __name__=='__main__':
+    port = int(os.environ.get("PORT",10000))
+    app.run(host='0.0.0.0',port=port)
