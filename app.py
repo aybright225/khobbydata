@@ -48,7 +48,8 @@ def verify(bundle_id, reference):
     return '<h1>Payment Failed</h1><a href="/">Try Again</a>'
 
 if __name__=='__main__':
-    app.run()
+    port = int(os.environ.get("PORT",10000))
+    app.run(host='0.0.0.0',port=port)
                    
                    
         
