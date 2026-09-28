@@ -1,85 +1,87 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>KhobbyData - Instant Data Bundles</title>
-  <link href="https://fonts.googleapis.com/css2? family=Inter:wght@600;800&display=swap" rel="stylesheet">
-  <style>
-    *{margin:0;padding:0;box box-sizing:border-box; font-family:'Inter',sans-serif}
-    .header{backgroung:white;padding:16px 20px;display:flex;justify-content:space-between;align-items:center;box-shadow:0 2px 10px rgba(0,0,0,.05)}
-    .logo{font-weight:800;font-size:22px;color:#0a66ff}.logo span{color:#ffcc00}
-    .live{background:#e6f9ed;color:#00a650;padding:6px 10px:border-radius:20px;font-size:12px;font-weight:700}
-    .hero{background:linear-gradient(135deg,#0a66ff,#0040a0);color:white;padding:28px 20px;text-align:center;border-radius:0 0 28px 28px}
-    .hero h1{font-size:26px;font-weight:800}.hero p{opacity:.9:margin-top:6px;font-size:14px}
-    .box{background:white;margin:-25px 0 15px;padding:18px;Border-radius:0px;box-shadow:0 10px 30px rgba(0,0,0,.08)}
-    .box input{width:100%;padding:14px;border:1px solid #e5e7eb;border-radius:10px;margin-top:8px;font-size:16px}
-    .box label{font-size:13px;font-weight:600;color:#444}
-    .grid{padding:0 16px;display:grid;grid-template-columns:1fr 1fr:gap:12px}
-    .card{background:white;border-radius:16px;padding:16px;text-align:center;box-shadow:0 4px 15px rgba(0,0,0,.04)}
-    .card .gb{font-size:26px;font-weight:800;color;#0a66ff}
-    .card button{width:30% !important;background:#0a66ff;color:white;border:none;padding:11px;border-radius:10px;font-weight:700;margin:10px auto 0 !important;display:block !important}
-    .card .price{margin-top:6px 0;font-weight:600}
-    .secure{display:flex;justify-content:center;gap:10px;align-items:center;margin:20px;font-size:12px;color:#666;background:white;padding:12px;border-radius:12px;margin:20px}
-    .footer{text-align:12px;paddingin:20px,color:#999;font-size:11px}
-    .body { font-family: Arial; text-align: center; padding: 50px; background: #f6f7fb; }
-     h1 { color: #007bff; }
-     .box { background: white; padding: 30px; border-radius: 15px; display: inline-block; box-shadow: 04px 10px rgba(0,0,0,0.1); }
-     a {background: #28a745; color: white; padding 12px 25px; text-decoration: none; border-radius: 8px; }
-   </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KhobbyBryt Data</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#121212;font-family: -apple-system,BlinkMacSystemFont,sans-serif;color:#fff}
+.header{background:#2E6BFF;padding:14px 16px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:10}
+.logo{display:flex;align-items:center;gap:10px;font-weight:800;font-size:20px}
+.logo-k{background:#fff;color:#2E6BFF;width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:900}
+.tabs{display:flex;gap:8px;padding:14px;justify-content:center}
+.tab{padding:12px 22px;border-radius:14px;font-weight:700;border:none}
+.tab.active{background:#FFC800;color:#000}
+.tab.inactive{background:#232323;color:#666}
+.info{display:flex;gap:18px;justify-content:center;color:#777;font-size:13px;padding-bottom:12px}
+.cards{padding:12px;max-width:500px;margin:0 auto}
+.card{background:#FFC800;border-radius:22px;padding:20px;margin-bottom:16px;color:#000}
+.top{display:flex;justify-content:space-between;align-items:center}
+.badge{border:1.5px solid #000;border-radius:20px;padding:3px 12px;font-size:10px;font-weight:800}
+.arrow{background:rgba(0,0,0,0.12);width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px}
+.gb{font-size:48px;font-weight:900;color:#fff;margin-top:28px;line-height:1;letter-spacing:-1px}
+.sub{font-size:14px;opacity:.8;margin-top:4px}
+.price-row{display:flex;justify-content:space-between;align-items:end;margin-top:24px}
+.price{font-size:36px;font-weight:900}
+.days{font-size:13px;opacity:.6}
+.buy{width:100%;margin-top:14px;padding:15px;background:#000;color:#FFC800;border:none;border-radius:12px;font-weight:800;font-size:16px;cursor:pointer}
+.wa{position:fixed;bottom:20px;right:20px;background:#25D366;width:56px;height:56px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:30px;text-decoration:none;z-index:99}
+</style>
 </head>
 <body>
-     <div class="header">
-         <div class="logo"><b>Khobby<span>Data</span></b></div>
-         <div class="live"> PAYSTACK SECURED</div>
-     </div>  
-     <div class="hero">
-         <h1>Instant Data Bundles</h1>
-         <p>Pay with Momo, Card, Bank. Delivered in 5minutes</p>
-         <p>MTN | Telecel |AirtelTigo</p><br>
-     </div>
-     <div class="box" style="padding:22px 14px;border-radius:0;margin:-18px 0 20px;width:100%;box-sizing:border-box;display:block">
-       <label>Number to receive data</label>
-       <input id="phoneMain" type="tel" placeholder="054...." style="width:100%;max-width:100%;box-sizing:border-box">
-       
-       <label style="margin-top:12px;display:block">Email for receipt</label>
-       <input id="emailMain" type="email" placeholder="your email" style="width:100%;max-width:100%;box-sizing:border-box">
-     </div>
 
-     <div class="grid">
-     {% for b in bundles %}
-       <div class="card">
-          <div style="font-size:32px;font-weight:900;margin:6px 0;line-height:1;color:#666">{{b.network.upper()}}  {{b.gb or b.id}}GB</div>
-          <div class="gb"{{b.gb or b.bundle}}</div>
-          <div style="font-size:12px;color:#888">No Expiry Instant</div>
-          <div class="price">GHS {{b.price}}</div>
-          <form action="/pay/{{b.id}}"
-          method="POST" onsubmit="return fill(this, {{b.id}})" style="margin:0">
-          <input type="hidden" name="phone" id="p{{b.id}}">
-          <input type="hidden" name="email" id="e{{b.id}}">  
-          <button type="submit"
-          style="width:100%; padding:12px; background:#0a66ff; color:#fff; border:0; border-radius:8px; font-weight:bold">Pay GHS {{b.price}}</button>
-          </form>
-       </div> 
-     {% endfor %}
-     </div>
+<div class="header">
+  <div class="logo"><div class="logo-k">K</div> KhobbyBryt</div>
+  <div style="font-size:22px">☀️ ☰</div>
+</div>
 
-     <div class="footer">
-       KhobbyData Ghana's Trusted Data Shop<br>
-       24/7 Automated Delivery
-     <div>
+<div class="tabs">
+  <button class="tab active">MTN</button>
+  <button class="tab inactive">AirtelTigo</button>
+  <button class="tab inactive">Telecel</button>
+</div>
 
-     <script>
-       function fill(f,id){
-         let p=document.getElementById('phoneMain').value;
-         let e=document.getElementById('emailMain').value;
-         if(!p || p.length<10){alert('Enter phone: '+p); return false}
-         if(!e || !e.includes('@')){alert('Enter valid email'); return false}
+<div class="info">
+  <span>{{ bundles|length }} bundles</span>
+  <span>⚡ Fast delivery</span>
+  <span>🛡️ Secure</span>
+</div>
 
-    document.getElementById('p'+id).value=p;
+<div class="cards">
+{% for b in bundles %}
+<div class="card">
+  <div class="top">
+    <div class="badge">{{ b.network.upper() }}</div>
+    <div class="arrow">⌄</div>
+  </div>
+  <div class="gb">{{ b.data }}</div>
+  <div class="sub">{{ b.network.upper() }} Bundle</div>
+  <div class="price-row">
+    <div class="price">¢{{ b.price }}</div>
+    <div class="days">90 days</div>
+  </div>
+  <form action="/pay/{{ b.id }}" method="POST" onsubmit="return fill(this, {{ b.id }})">
+    <input type="hidden" name="phone" id="p{{ b.id }}">
+    <input type="hidden" name="email" id="e{{ b.id }}">
+    <button class="buy">Buy Now</button>
+  </form>
+</div>
+{% endfor %}
+</div>
 
-    document.getElementById('e'+id).value=e;
-         return true;
-     }
-     </script>
+<a href="https://wa.me/233559123456" class="wa">💬</a>
+
+<script>
+function fill(f,id){
+  let phone = prompt("Enter MTN number:");
+  if(!phone || phone.length < 10){ alert("Enter valid number"); return false; }
+  let email = prompt("Enter email (optional):") || "customer@khobby.com";
+  document.getElementById("p"+id).value = phone;
+  document.getElementById("e"+id).value = email;
+  return true;
+}
+</script>
+
 </body>
 </html>
-         
