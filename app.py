@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, redirect
 import os, requests
 
 app = Flask(__name__)
@@ -56,10 +56,10 @@ def pay(bid):
 if b["id"]==bid), None)
     secret = os.getenv("PAYSTACK_SECRET_KEY")
     r = request.post("https://api.paystack.co/transaction/initialize", json={"email": email, "amount": int(bundle["price"]*100), "currency":"GHS", "callback_url": f"{request.host_url}verify/{bid}/{phone}"}, headers={"Authorization":f"Bearer {secret}"})
-    data = r.json()
-    if data.get("status"):
-        return redirect(data["data"]["authorization_url"])
-    return f"Paystack Error: {data}"    
+    j = r.json()
+    if j.get("status"):
+        return redirect(j["data"]["authorization_url"])
+    return f"Paystack Error: {j}"    
 
 if __name__=='__main__':
     port = int(os.environ.get("PORT",10000))
