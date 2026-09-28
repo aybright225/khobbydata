@@ -90,20 +90,16 @@
      </script>
      <script>
        function fill(f,id){
-         let
-           p=document.getElementById('phoneMain').value ||
-           document.getElementById('phone').value;
-         let
-           e=document.getElementById('emailMain').value ||
-           document.getElementById('email').value:
-         if(p.length<10){alert('Enter phone');return false}
-         if(!e.includes(@)){alert('Enter email');return false}
+         let p=document.getElementById('phoneMain').value;
+         let e=document.getElementById('emailMain').value;
+         if(!p || p.length<10){alert('Enter phone: '+p); return false}
+         if(!e || !e.includes('@')){alert('Enter valid email'); return false}
 
     document.getElementById('p'+id).value=p;
 
     document.getElementById('e'+id).value=e;
          return true;
-       }
+     }
      </script>
 </body>
 </html>
