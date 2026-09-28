@@ -1,14 +1,5 @@
-from flask import Flask, render_template
-
-app=Flask(__name__)
-
-@app.route('/')
-def home():
-    return render_template('index.html')
-
-@app.route('/health')           
-def health():
-    return "KhobbyData is Live!"
-  
-if __name__ == '__main__':    
- app.run(host='0.0.0.0', port=10000)   
+@app.route('/verify/<int:bundle_id>/<reference>')
+def verify(bundle_id, reference):
+    phone = request.args.get('phone')
+    print(f"NEW ORDER: {bundle_id} for {phone} Ref {reference}")
+    return f:<h1>Paid! Data to {phone} will arrive in 5 minutes</h1>"
