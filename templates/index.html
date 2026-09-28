@@ -1,28 +1,86 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>KhobbyData - Data Bundles</title>
+  <title>KhobbyData - Instant Data Bundles</title>
+  <link href="https://fonts.googleapis.com/css2? family=Inter:wght@600;800&display=swap" rel="stylesheet">
   <style>
-     body { font-family: Arial; text-align: center; padding: 50px; background: #f0f8ff; }
+    *{margin:0;padding:0;box box-sizing:border-box; font-family:'Inter',sans-serif}
+    .header{backgroung:white;padding:16px 20px;display:flex;justify-content:space-between;align-items:center;box-shadow:0 2px 10px rgba(0,0,0,.05)}
+    .logo{font-weight:800;font-size:22px;color:#0a66ff}.logo span{color:#ffcc00}
+    .live{background:#e6f9ed;color:#00a650;padding:6px 10px:border-radius:20px;font-size:12px;font-weight:700}
+    .hero{background:linear-gradient(135deg,#0a66ff,#0040a0);color:white;padding:28px 20px;text-align:center;border-radius:0 0 28px 28px}
+    .hero h1{font-size:26px;font-weight:800}.hero p{opacity:.9:margin-top:6px;font-size:14px}
+    .box{background:white;margin:-25px 20px 15px;padding:18px;Border-radius:16px;box-shadow:0 10px 30px rgba(0,0,0,.08)}
+    .box input{width:100px;padding:14px;border:1px; solid #e5e7eb;border-radius10px;margin-top:8px;font-size:16px}
+    .box label{font-size:13px;font-weight:600;color:#444}
+    .grid{padding:0 16px;display:grid;grid-template-columns:1fr 1fr:gap:12px}
+    .card{background:white;border-radius:16px;padding:16px;text-align:center;box-shadow:0 4px 15px rgba(0,0,0,.04)}
+    .card .gb{font-size:26px;font-weight:800;color;#0a66ff}
+    .card button{width:100px;background:#0a66ff;color:white;border:none;padding:11px;border-radius:10px;font-weight:700;margin-top:8px}
+    .card .price{margin-top:6px 0;font-weight:600}
+    .secure{display:flex;justify-content:center;gap:10px;align-items:center;margin:20px;font-size:12px;color:#666;background:white;padding:12px;border-radius:12px;margin:20px}
+    .footer{text-align:12px;paddingin:20px,color:#999;font-size:11px}
+    .body { font-family: Arial; text-align: center; padding: 50px; background: #f6f7fb; }
      h1 { color: #007bff; }
      .box { background: white; padding: 30px; border-radius: 15px; display: inline-block; box-shadow: 04px 10px rgba(0,0,0,0.1); }
      a {background: #28a745; color: white; padding 12px 25px; text-decoration: none; border-radius: 8px; }
    </style>
 </head>
 <body>
-     <div class="box">
-         <h1>KhobbyData is LIVE!</h1>
-         <p>Welcome to Ghana's Best Data Bundle Shop</p>
+     <div class="header">
+         <div class="logo">Khobby<span>Data</span></div>
+         <div class="live"> PAYSTACK SECURED</div>
+     </div>  
+     <div class="hero">
+         <h1>Instant Data Bundles</h1>
+         <p>Pay with Momo, Card, Bank. Delivered in 5minutes</p>
          <p>MTN | Telecel |AirtelTigo</p><br>
-         <a href="https://wa.me/+233533081832"Order on Whatsapp</a>
-         <p style="margin-top:20px; color: green;"><b>Status: LIVE</b></p><br>
      </div>
-     <p>
-     <div class="card"><div><b>MTN 1GB</b><br> 4.90</div><a class="btn" href"https://wa.me/233533081932? text=I want 1GB">Buy</p></a></div>
-     <div class="card"><div><b>MTN 2GB</b><br> 9.90</div><a class="btn" href"https://wa.me/233533081932? text=I want 2GB">Buy</a></div>
-     <div class="card"><div><b>MTN 3GB</b><br> 14.70</div><a class="btn" href"https://wa.me/233533081932? text=I want 3GB">Buy</a></div>
-     <div class="card"><div><b>MTN 4GB</b><br> 19.80</div><a class="btn" href"https://wa.me/233533081932? text=I want 4GB">Buy</a></div>
-     <div class="card"><div><b>MTN 5GB</b><br> 24.50</div><a class="btn" href"https://wa.me/233533081932? text=I want 5GB">Buy</a></div>       
+     <div class="box">
+       <label>Number to receive data</label>
+       <input id="phone" type="tel" placeholder="054....">
+       <label style="margin-top:12px;display:block">Email for receipt</label>label>
+       <input id="email" type="email" placeholder="your email">
+     </div>
+
+     <div class="grid">
+     {% for b in bundles %}
+       <div class="card">
+          <div style="font-size:12px;font-weight:700;color:#666">{{b.network.upper()}}</div>
+          <div class="gb"{{b.data}}</div>
+          <div style="font-size:11px;color:#888">No Expiry Instant</div>
+          <div class="price">GHS {{b.price}}</div>
+          <button onclick="pay({{b.id}}, {{b.price}}">Pay GHS {{b.price}}</button>
+       </div> 
+     {% endfor %}
+     </div>
+
+     <div class="footer">
+       KhobbyData Ghana's Trusted Data Shop<br>
+       24/7 Automated Delivery
+     <div>
+
+     <script src="https://js.paystack.co/v1/inline.js"></script>
+     <script>
+       function pay(id, price){
+         let
+           phone=document.getElementById('phone').value;
+           email=document.getElementById('email').value;
+             if(phone.length<10){alert('Enter data number');return;}
+             if(!email.includes('@')){alert('Enter email');return;}
+             var handler=PaystackPop.setup({
+               key:'{{paystack_public}}',
+               email:email,
+               amount:price*100,
+               currency:'GHS',
+               metadata:{phone:phone},
+               ref:'KHOBBY_'+Date.now(),
+               callback:function(res) {window.location.href='/verify/'+id+'/'+res.reference+'? phone='+phone},
+               onClose:function(){}
+             });
+             handler.openIframe();
+       }
+     </script>                                                
 </body>
 </html>
          
