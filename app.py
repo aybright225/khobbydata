@@ -55,7 +55,7 @@ def pay(bid):
     bundle = next((b for b in BUNDLES
 if b["id"]==bid), None)
     secret = os.getenv("PAYSTACK_SECRET_KEY")
-    r = request.post("https://api.paystack.co/transaction/initialize", json={"email": email, "amount": int(bundle["price"]*100), "currency":"GHS", "callback_url": f"{request.host_url}verify/{bid}/{phone}"}, headers={"Authorization":f"Bearer {secret}"})
+    r = requests.post("https://api.paystack.co/transaction/initialize", json={"email": email, "amount": int(bundle["price"]*100), "currency":"GHS", "callback_url": f"{request.host_url}verify/{bid}/{phone}"}, headers={"Authorization":f"Bearer {secret}"})
     j = r.json()
     if j.get("status"):
         return redirect(j["data"]["authorization_url"])
