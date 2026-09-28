@@ -3,7 +3,7 @@ import os, requests
 
 app = Flask(__name__)
 
-PAYSTACK_SECRET = os.ebviron.get("PAYSTACK_SECRET_KEY")
+PAYSTACK_SECRET = os.environ.get("PAYSTACK_SECRET_KEY")
 PAYSTACK_PUBLIC = os.environ.get("PAYSTACK_PUBLIC_KEY")
 
 BUNDLES = [
