@@ -47,9 +47,10 @@
      <div class="grid">
      {% for b in bundles %}
        <div class="card">
-          <div style="font-size:12px;font-weight:700;color:#666">{{b.network.upper()}}</div>
-          <div class="gb"{{b.data}}</div>
-          <div style="font-size:11px;color:#888">No Expiry Instant</div>
+          <div class="mtn">{{b.network.upper() if b.network else 'MTN'}}</div>
+          <div style="font-size:32px;font-weight:900;margin:6px 0;line-height:1;color:#666">{{b.network.upper()}}  {{b.data or b.gb or b.size or b.bundle_size or b.name or b.id}}GB</div>
+          <div class="gb"{{b.data or b.gb or b.bundle}}</div>
+          <div style="font-size:12px;color:#888">No Expiry Instant</div>
           <div class="price">GHS {{b.price}}</div>
           <form action="/pay/{{b.id}}"
           method="POST" onsubmit="return fill(this, {{b.id}})" style="margin:0">
