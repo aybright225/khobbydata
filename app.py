@@ -165,54 +165,51 @@ def admin():
     html += "</table></body></html>"
     return html
 
-@app.route('/paaystack/webhook', methods=['POST'])
+# --- WEBHOOK + ADMIN - FIXED VERSION ---
+@app.route('/paystack/webhook', methods=['POST'])
 def paystack_webhook():
-    from flask import request
-    import json
-    
-    data = request.get_json(silent=True)
-    print(f"WEBHOOK RECEIVED: {json.dumps(data)[:500]}")
+    data = request.get_json(silent=True) or {}
+    print("WEBHOOK RECEIVED")
+    try:
+        if data.get('event') == 'charge.success':
+            d = data.get('data', {})
+            meta = d.get('metadata', {}) or {}
+            phone = meta.get('phone')
+            if not phone:
+                auth = d.get('authorization', {}) or {}
+                phone = auth.get('mobile_money_number', 'UNKNOWN')
+            
+            order = {
+                'time': d.get('paid_at', ''),
+                'phone': phone,
+                'network': meta.get('network', 'mtn'),
+                'bundle': meta.get('bundle', '1GB'),
+                'price': d.get('amount', 0) / 100,
+                'reference': d.get('reference', '')
+            }
+            orders = load_orders()
+            orders.append(order)
+            save_orders(orders)
+            print(f"ORDER SAVED: {phone}")
+    except Exception as e:
+        print(f"WEBHOOK ERROR: {e}")
+    return {"status": "ok"}, 200
 
-    if data and data.get('event') == 'charge.success':
-        phone = None
-        network = "mtn"
-        bundle = "1GB"
+@app.route('/admin')
+def admin():
+    pin = request.args.get('pin')
+    if pin != ADMIN_PIN:
+        return '<form style="text-align:center;margin-top:100px"><h1>Enter PIN</h1><input type="password" id="p"><button type="button" onclick="location.href=\'/admin?pin=\'+document.getElementById(\'p\').value">Go</button></form>'
+    orders = load_orders()
+    total = sum(float(o.get('price', 0)) for o in orders)
+    rows = ""
+    for o in orders:
+        rows += f"<tr><td>{o.get('time','')}</td><td>{o.get('phone','')}</td><td>{o.get('bundle','')}</td><td>{o.get('price','')}</td><td>{o.get('reference','')}</td></tr>"
+    return f"<html><head><meta name='viewport' content='width=device-width'><style>body{{background:#121212;color:#fff;font-family:Arial;padding:20px}}table{{width:100%;border-collapse:collapse}}td,th{{border:1px solid #333;padding:8px;text-align:left}}</style></head><body><h2>KhobbyBryt Admin</h2><p>{len(orders)} orders - GHS {total}</p><table><tr><th>Time</th><th>Phone</th><th>Bundle</th><th>Price</th><th>Ref</th></tr>{rows}</table></body></html>"
 
-        metadata = data['data'].get('metadata', {})
-        phone = metadata.get('phone')
+@app.route('/success')
+def success():
+    return "Payment successful! Your data will arrive shortly."
 
-        if not phone:
-            auth = data['data'].get('authorization', {})
-            phone = auth.get('mobile_money_number') or auth.get('account_name')
-            print(f"NO METADATA - Using payer number: {phone}")
-
-        print(f"ORDER TO DELIVER:{phone} - {network} - {bundle}")
-
-        try:
-            with open("orders.txt", "a") as f:
-                f.write(f"{phone} | {network} | {bundle} | {data['data'] ['reference']}\n")
-        except:
-            pass
-
-        return {"status": "ok"}, 200
-
-@app.route('/health')
-def health():
-    return "ok", 200
-
-@app.route('/sitemap.xml')
-def sitemap():
-    return """<?xml version="1.0" encoding="UFT-8"?>
-    <urlset xm1ns="http://www.sitemaps.org/schemas/sitemap/0.9">
-    <url><loc>https://khobbydata.onrender.com/</loc><priority>1.0</priority><changefreq>daily</changefreq></url>
-    </urlset>""", 200, {'Content-Type': 'application/xml'}
-
-@app.route('/robots.txt')
-def robots():
-    return """User-agent: *
-    Allow: /
-    Sitemap: https://khobbydata.onrender.com/sitemap.xml""", 200, {'Content-Type':'text/plain'}
-    
-if __name__=='__main__':
-    port = int(os.environ.get("PORT",10000))
-    app.run(host='0.0.0.0',port=port)
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=10000)
