@@ -57,7 +57,7 @@ def buy_from_datamart(phone, network, data_str):
 def home():
     return render_template('index.html', bundles=BUNDLES)
 
-@app.route('/pay/<int:bid>', methods=["POST"])
+@app.route('/pay/<int:bid>', methods=['GET','POST'])
 def pay(bid):
     phone = request.form.get("phone")
     email = request.form.get("email") or "customer@khobby.com"
