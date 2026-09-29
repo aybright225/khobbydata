@@ -151,6 +151,19 @@ def admin():
     html += "</table><br><p style='font-size:11px;color:#777'>Last 200 orders. Pin: ?pin=5330 | WhatsApp: 233533081932</p></body></html>"
     return html
 
+@app.route('/sitemap.xml')
+def sitemap():
+    return """<?xml version="1.0" encoding="UFT-8"?>
+    <urlset xm1ns="http://www.sitemaps.org/schemas/sitemap/0.9">
+    <url><loc>https://khobbydata.onrender.com/</loc><priority>1.0</priority><changefreq>daily</changefreq></url>
+    </urlset>""", 200, {'Content-Type': 'application/xml'}
+
+@app.route('/robots.txt')
+def robots():
+    return """User-agent: *
+    Allow: /
+    Sitemap: https://khobbydata.onrender.com/sitemap.xml""", 200, {'Content-Type':'text/plain'}
+    
 if __name__=='__main__':
     port = int(os.environ.get("PORT",10000))
     app.run(host='0.0.0.0',port=port)
