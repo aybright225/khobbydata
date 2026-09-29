@@ -80,10 +80,10 @@ data = {
   },
   "callback_url": "https://khobbydata.onrender.com/success"
 }
-    r = requests.post("https://api.paystack.co/transaction/initialize", json=data, headers=headers)
-    j = r.json()
-    if j.get("status"): return redirect(j["data"]["authorization_url"])
-    return f"Paystack Error: {j}"
+r = requests.post("https://api.paystack.co/transaction/initialize", json=data, headers=headers)
+j = r.json()
+if j.get("status"): return redirect(j["data"]["authorization_url"])
+return f"Paystack Error: {j}"
 
 @app.route('/verify/<int:bundle_id>/<reference>')
 def verify(bundle_id, reference):
