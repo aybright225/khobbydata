@@ -9,7 +9,7 @@ app = Flask(__name__)
 # === CONFIG ===
 ADMIN_PIN = "5329"
 ORDERS_FILE = "orders.json"
-PAYSTACK_SECRET = os.environ.get("PAYSTACK_SECRET", "").strip()
+PAYSTACK_SECRET = os.environ.get("PAYSTACK_SECRET_KEY").strip()
 
 # Your 10 MTN bundles - exact as you said
 MTN_BUNDLES = [
