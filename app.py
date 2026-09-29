@@ -82,7 +82,8 @@ data = {
 }
 r = requests.post("https://api.paystack.co/transaction/initialize", json=data, headers=headers)
 j = r.json()
-if j.get("status"): return redirect(j["data"]["authorization_url"])
+if j.get("status"):
+    return redirect(j["data"]["authorization_url"])
 return f"Paystack Error: {j}"
 
 @app.route('/verify/<int:bundle_id>/<reference>')
