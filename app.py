@@ -6,7 +6,7 @@ app = Flask(__name__)
 
 PAYSTACK_SECRET = os.environ.get("PAYSTACK_SECRET_KEY")
 DATAMART_API_KEY = "c3bb2d66891ca2dc895fd83acc484da89594b410071bb05911bf258ee515da97"
-DATAMART_BASE = "https://api.datamartgh.shop/api/developer"
+DATAMART_BASE = "https://api.datamartgh.shop/api"
 ADMIN_PIN = "5330"  # Change this to your own PIN
 
 ORDERS_FILE = "orders.json"
