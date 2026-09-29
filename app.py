@@ -186,15 +186,15 @@ def paystack_webhook():
             phone = auth.get('mobile_money_number') or auth.get('account_name')
             print(f"NO METADATA - Using payer number: {phone}")
 
-     print(f"ORDER TO DELIVER:{phone} - {network} - {bundle}")
+        print(f"ORDER TO DELIVER:{phone} - {network} - {bundle}")
 
-     try:
-         with open("orders.txt", "a") as f:
-             f.write(f"{phone} | {network} | {bundle} | {data['data'] ['reference']}\n")
-     except:
-         pass
+        try:
+            with open("orders.txt", "a") as f:
+                f.write(f"{phone} | {network} | {bundle} | {data['data'] ['reference']}\n")
+        except:
+            pass
 
-  return {"status": "ok"}, 200
+        return {"status": "ok"}, 200
 
 @app.route('/health')
 def health():
