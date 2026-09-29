@@ -13,15 +13,15 @@ ORDERS_FILE = "orders.json"
 
 BUNDLES = [
     {"id":1, "network":"mtn", "data":"1GB", "price":4.80},
-    {"id":2, "network":"mtn", "data":"2GB", "price":9.90},
-    {"id":3, "network":"mtn", "data":"3GB", "price":14.70},
+    {"id":2, "network":"mtn", "data":"2GB", "price":9.60},
+    {"id":3, "network":"mtn", "data":"3GB", "price":14.50},
     {"id":4, "network":"mtn", "data":"4GB", "price":19.80},
     {"id":5, "network":"mtn", "data":"5GB", "price":24.50},
     {"id":6, "network":"mtn", "data":"6GB", "price":29.50},
-    {"id":7, "network":"mtn", "data":"7GB", "price":34.00},
-    {"id":8, "network":"mtn", "data":"8GB", "price":39.50},
-    {"id":9, "network":"mtn", "data":"9GB", "price":44.00},
-    {"id":10, "network":"mtn", "data":"10GB", "price":49.50}
+    {"id":7, "network":"mtn", "data":"8GB", "price":37.00},
+    {"id":8, "network":"mtn", "data":"10GB", "price":48.50},
+    {"id":9, "network":"mtn", "data":"15GB", "price":70.00},
+    {"id":10, "network":"mtn", "data":"20GB", "price":91.50}
 ]
 
 def load_orders():
