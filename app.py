@@ -1,6 +1,6 @@
 from flask import Flask, request, jsonify, render_template_string, redirect
 import json
-import os
+import os, uuid
 import requests
 from datetime import datetime
 
@@ -151,7 +151,37 @@ def admin():
 
 @app.route("/success")
 def success():
-    return "<div style='text-align:center;margin-top:100px;font-family:Arial'><h1>✅ Payment Successful</h1><p>Your data will be delivered soon</p><a href='/'>Home</a></div>"
+    reference = request.args.get("reference")
+    phone = request.args.get("phone") or session.get("phone")
+    capacity = session.get("capacity", "1")  # 1 = 1GB, 2 = 2GB etc
 
+    # 1. Verify Paystack
+    verify = requests.get(
+        f"https://api.paystack.co/transaction/verify/{reference}",
+        headers={"Authorization": f"Bearer {os.getenv('PAYSTACK_SECRET')}"}
+    )
+    print(f"PAYSTACK VERIFY: {verify.text}")
+
+    if verify.json().get("data", {}).get("status") == "success":
+        try:
+            payload = {
+                "phoneNumber": phone,  # must be 055xxxxxxx
+                "network": "YELLO",    # MTN is always YELLO for DataMART
+                "capacity": str(capacity),
+                "gateway": "wallet"
+            }
+            headers = {
+                "X-API-Key": os.getenv("DATAMART_API_KEY"),
+                "Content-Type": "application/json",
+                "X-Idempotency-Key": str(uuid.uuid4())
+            }
+            url = f"{os.getenv('DATAMART_BASE')}/purchase"
+            print(f"SENDING TO DATAMART MTN: {payload}")
+            r = requests.post(url, json=payload, headers=headers, timeout=30)
+            print(f"DATAMART RESPONSE: {r.status_code} {r.text}")
+        except Exception as e:
+            print(f"DATAMART FAILED: {e}")
+
+    return "Payment Successful - Your MTN data will be delivered soon"
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 10000)))
