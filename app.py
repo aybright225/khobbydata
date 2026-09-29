@@ -80,8 +80,8 @@ data = {
   },
   "callback_url": "https://khobbydata.onrender.com/success"
 }
- r = requests.post("https://api.paystack.co/transaction/initialize", json=data, headers=headers)
- j = r.json()
+r = requests.post("https://api.paystack.co/transaction/initialize", json=data, headers=headers)
+j = r.json()
 if j.get("status"):
  return redirect(j["data"]["authorization_url"])
 return f"Paystack Error: {j}"
@@ -146,10 +146,10 @@ def verify(bundle_id, reference):
 
 @app.route('/admin')
 def admin():
-    pin = request.args.get("pin", "")
+    pin = request.args.get('pin')
     if pin != ADMIN_PIN:
-        return '<form style="text-align:center;margin-top:100px"><h2>Enter Admin PIN</h2><input type="password" name="pin" placeholder="PIN"><button>Login</button></form>', 401
-    
+        return '<form style="text-align:center;margin-top:100px"><h2>Enter Admin PIN</h2><input type="password" id="p"><button onclick="location.href=\'/admin? pin=\'+document.getElementById(\'p\').value">Go</button></form>'
+       
     orders = load_orders()
     total_sales = sum(float(o.get('price',0)) for o in orders)
     
@@ -162,14 +162,39 @@ def admin():
     for o in orders:
         cls = "delivered" if "DELIVERED" in o.get('status','') else "processing"
         html += f"<tr><td>{o.get('time','')}</td><td>{o.get('phone','')}</td><td><b>{o.get('bundle','')}</b></td><td>¢{o.get('price','')}</td><td class='{cls}'><b>{o.get('status','')}</b></td><td style='font-size:10px'>{o.get('ref','')[:20]}...</td></tr>"
-    html += "</table><br><p style='font-size:11px;color:#777'>Last 200 orders. Pin: ?pin=5330 | WhatsApp: 233533081932</p></body></html>"
+    html += "</table></body></html>"
     return html
 
 @app.route('/paaystack/webhook', methods=['POST'])
 def paystack_webhook():
+    from flask import request
+    import json
+    
     data = request.get_json(silent=True)
-    print(f"PAYSTACK WEBHOOK RECEIVED: {data}")
-    return jsonify({"status": "ok"}), 200
+    print(f"WEBHOOK RECEIVED: {json.dumps(data)[:500]}")
+
+    if data and data.get('event') == 'charge.success':
+        phone = None
+        network = "mtn"
+        bundle = "1GB"
+
+        metadata = data['data'].get('metadata', {})
+        phone = metadata.get('phone')
+
+        if not phone:
+            auth = data['data'].get('authorization', {})
+            phone = auth.get('mobile_money_number') or auth.get('account_name')
+            print(f"NO METADATA - Using payer number: {phone}")
+
+     print(f"ORDER TO DELIVER:{phone} - {network} - {bundle}")
+
+     try:
+         with open("orders.txt", "a") as f:
+             f.write(f"{phone} | {network} | {bundle} | {data['data'] ['reference']}\n")
+     except:
+         pass
+
+  return {"status": "ok"}, 200
 
 @app.route('/health')
 def health():
