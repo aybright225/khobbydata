@@ -151,6 +151,12 @@ def admin():
     html += "</table><br><p style='font-size:11px;color:#777'>Last 200 orders. Pin: ?pin=5330 | WhatsApp: 233533081932</p></body></html>"
     return html
 
+@app.route('/paaystack/webhook', methods=['POST'])
+def paystack_webhook():
+    data = request.get_json(silent=True)
+    print(f"PAYSTACK WEBHOOK RECEIVED: {data}")
+    return jsonify({"status": "ok"}), 200
+
 @app.route('/sitemap.xml')
 def sitemap():
     return """<?xml version="1.0" encoding="UFT-8"?>
