@@ -6,7 +6,7 @@
 <title>KhobbyBryt Data</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-body{background:#121212;font-family: -apple-system,BlinkMacSystemFont,sans-serif;color:#fff}
+body{background:#121212;font-family:-apple-system,BlinkMacSystemFont,sans-serif;color:#fff}
 .header{background:#2E6BFF;padding:14px 16px;display:flex;align-items:center;position:sticky;top:0;z-index:10}
 .logo{display:flex;align-items:center;gap:10px;font-weight:800;font-size:20px}
 .logo-k{background:#fff;color:#2E6BFF;width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:900}
@@ -16,62 +16,40 @@ body{background:#121212;font-family: -apple-system,BlinkMacSystemFont,sans-serif
 .cards{padding:12px;max-width:500px;margin:0 auto;padding-bottom:90px}
 .card{background:#FFC800;border-radius:22px;padding:20px;margin-bottom:16px;color:#000}
 .badge{border:1.5px solid #000;border-radius:20px;padding:3px 12px;font-size:10px;font-weight:800;display:inline-block}
-.gb{font-size:48px;font-weight:900;color:#fff;margin-top:28px;line-height:1;letter-spacing:-1px}
+.gb{font-size:48px;font-weight:900;color:#fff;margin-top:28px;line-height:1}
 .sub{font-size:14px;opacity:.8;margin-top:4px}
 .price-row{display:flex;justify-content:space-between;align-items:end;margin-top:24px}
 .price{font-size:36px;font-weight:900}
 .days{font-size:13px;opacity:.6}
-.buy{width:100%;margin-top:14px;padding:15px;background:#000;color:#FFC800;border:none;border-radius:12px;font-weight:800;font-size:16px;cursor:pointer}
-.wa{position:fixed;bottom:20px;right:20px;background:#25D366;width:56px;height:56px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:30px;text-decoration:none;z-index:99;box-shadow:0 4px 15px rgba(0,0,0,0.4)}
+.buy{width:100%;margin-top:14px;padding:15px;background:#000;color:#FFC800;border:none;border-radius:12px;font-weight:800;font-size:16px}
+.wa{position:fixed;bottom:20px;right:20px;background:#25D366;width:56px;height:56px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:30px;text-decoration:none;z-index:99}
 </style>
 </head>
 <body>
-
-<div class="header">
-  <div class="logo"><div class="logo-k">K</div> KhobbyBryt</div>
-</div>
-
-<div class="tabs">
-  <button class="tab">MTN</button>
-</div>
-
-<div class="info">
-  <span>{{ bundles|length }} bundles</span>
-  <span>⚡ Fast delivery</span>
-  <span>🛡️ Secure</span>
-</div>
-
+<div class="header"><div class="logo"><div class="logo-k">K</div> KhobbyBryt</div></div>
+<div class="tabs"><button class="tab">MTN</button></div>
+<div class="info"><span>{{ bundles|length }} bundles</span><span>⚡ Fast delivery</span><span>🛡️ Secure</span></div>
 <div class="cards">
 {% for b in bundles %}
 <div class="card">
-  <div class="badge">{{ b.network.upper() }}</div>
-  <div class="gb">{{ b.data }}</div>
-  <div class="sub">{{ b.network.upper() }} Bundle</div>
-  <div class="price-row">
-    <div class="price">¢{{ b.price }}</div>
-    <div class="days">90 days</div>
-  </div>
-  <form action="/pay/{{ b.id }}" method="POST" onsubmit="return fill(this, {{ b.id }})">
-    <input type="hidden" name="phone" id="p{{ b.id }}">
-    <input type="hidden" name="email" id="e{{ b.id }}">
-    <button class="buy">Buy Now</button>
-  </form>
+<div class="badge">{{ b.network.upper() }}</div>
+<div class="gb">{{ b.data }}</div>
+<div class="sub">{{ b.network.upper() }} Bundle</div>
+<div class="price-row"><div class="price">¢{{ b.price }}</div><div class="days">90 days</div></div>
+<form action="/pay/{{ b.id }}" method="POST" onsubmit="return fill(this, {{ b.id }})">
+<input type="hidden" name="phone" id="p{{ b.id }}"><input type="hidden" name="email" id="e{{ b.id }}">
+<button class="buy">Buy Now</button>
+</form>
 </div>
 {% endfor %}
 </div>
-
 <a href="https://wa.me/233533081932" class="wa">💬</a>
-
 <script>
 function fill(f,id){
-  let phone = prompt("Enter MTN number:");
-  if(!phone || phone.length < 10){ alert("Enter valid number"); return false; }
-  let email = prompt("Enter email (optional):") || "customer@khobby.com";
-  document.getElementById("p"+id).value = phone;
-  document.getElementById("e"+id).value = email;
-  return true;
+let phone=prompt("Enter MTN number:");if(!phone||phone.length<10){alert("Invalid");return false}
+let email=prompt("Email (optional):")||"customer@khobby.com";
+document.getElementById("p"+id).value=phone;document.getElementById("e"+id).value=email;return true
 }
 </script>
-
 </body>
 </html>
