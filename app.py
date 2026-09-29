@@ -5,7 +5,7 @@ from datetime import datetime
 app = Flask(__name__)
 
 PAYSTACK_SECRET = os.environ.get("PAYSTACK_SECRET_KEY")
-DATAMART_API_KEY = "c3bb2d66891ca2dc895fd83acc484da89594b410071bb05911bf258ee515da97"
+DATAMART_API_KEY = "d7b2427ac995deb13c8b5fa37d81c8967a6ba0222a649861bffd0f187c7a3f35"
 DATAMART_BASE = "https://api.datamartgh.shop/api"
 ADMIN_PIN = "5330"  # Change this to your own PIN
 
