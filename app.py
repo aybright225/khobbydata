@@ -46,9 +46,9 @@ def buy_from_datamart(phone, network, data_str):
     try:
         gb = int(data_str.replace("GB","").strip())
         headers = {"X-API-Key": DATAMART_API_KEY, "Content-Type": "application/json"}
-        payload = {"ref": f"khobby-{int(time.time())}", "phone": phone, "network": network.lower(), "volume": gb}
+        payload = {"ref": f"khobby-{int(time.time())}", "phone": phone, "network": network.lower(), "volume": gb, "capacity":f"{gb}GB", "amount":gb}
         r = requests.post(f"{DATAMART_BASE}/purchase", json=payload, headers=headers, timeout=30)
-        print(r.text)
+        print(f"DATAMART_BASE RESPONSE:{r.text}")
         return r.json()
     except Exception as e:
         return {"status": "error", "message": str(e)}
