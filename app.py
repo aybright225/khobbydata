@@ -1,31 +1,30 @@
-from flask import Flask, request, jsonify, render_template_string, redirect, session
+from flask import Flask, request, render_template_string, redirect, jsonify
 import json
-import os, uuid
+import os
 import requests
+import uuid
 from datetime import datetime
 
 app = Flask(__name__)
-app.secret_key = os.getenv("SECRET_KEY")
 
-# === CONFIG ===
 ADMIN_PIN = "5329"
 ORDERS_FILE = "orders.json"
-PAYSTACK_SECRET = os.environ.get("PAYSTACK_SECRET_KEY").strip()
-DATAPLAZA_BASE  = os.getenv("DATAPLAZA_BASE", "https://dataplaza.com")
-DATAPLAZA_API_KEY = os.getenv("DATAPLAZA_API_KEY")
+PAYSTACK_SECRET = (os.environ.get("PAYSTACK_SECRET") or os.environ.get("PAYSTACK_SECRET_KEY") or "").strip()
+PAYSTACK_PUBLIC = (os.environ.get("PAYSTACK_PUBLIC_KEY") or os.environ.get("PAYSTACK_PUBLIC") or "").strip()
+DATAPLAZA_BASE = (os.getenv("DATAPLAZA_BASE") or "https://dataplazagh.com").strip()
+DATAPLAZA_API_KEY = (os.getenv("DATAPLAZA_API_KEY") or "").strip()
 
-# Your 10 MTN bundles - exact as you said
 MTN_BUNDLES = [
-    {"size": "1GB", "price": 4.8, "valid": "90 days"},
-    {"size": "2GB", "price": 9.7, "valid": "90 days"},
-    {"size": "3GB", "price": 14.6, "valid": "90 days"},
-    {"size": "4GB", "price": 19.5, "valid": "90 days"},
-    {"size": "5GB", "price": 24.0, "valid": "90 days"},
-    {"size": "6GB", "price": 29.0, "valid": "90 days"},
-    {"size": "8GB", "price": 39.0, "valid": "90 days"},
-    {"size": "10GB", "price": 49.5, "valid": "90 days"},
-    {"size": "15GB", "price": 70.0, "valid": "90 days"},
-    {"size": "20GB", "price": 95.0, "valid": "90 days"},
+    {"size": "1GB", "price": 4.8, "cap": "1", "valid": "90 days"},
+    {"size": "2GB", "price": 9.7, "cap": "2", "valid": "90 days"},
+    {"size": "3GB", "price": 14.6, "cap": "3", "valid": "90 days"},
+    {"size": "4GB", "price": 19.5, "cap": "4", "valid": "90 days"},
+    {"size": "5GB", "price": 24.0, "cap": "5", "valid": "90 days"},
+    {"size": "6GB", "price": 29.0, "cap": "6", "valid": "90 days"},
+    {"size": "8GB", "price": 39.0, "cap": "8", "valid": "90 days"},
+    {"size": "10GB", "price": 49.5, "cap": "10", "valid": "90 days"},
+    {"size": "15GB", "price": 70.0, "cap": "15", "valid": "90 days"},
+    {"size": "20GB", "price": 95.0, "cap": "20", "valid": "90 days"},
 ]
 
 def load_orders():
@@ -41,7 +40,6 @@ def save_orders(orders):
     with open(ORDERS_FILE, "w") as f:
         json.dump(orders, f, indent=2)
 
-# === YOUR YELLOW DESIGN FROM YOUR PHOTO ===
 PAGE_HTML = """
 <!DOCTYPE html>
 <html>
@@ -51,43 +49,47 @@ PAGE_HTML = """
 <title>KhobbyBryt Data</title>
 <style>
 body{margin:0;background:#0f0f0f;color:#fff;font-family:Arial}
-.header{background:#2a4bff;padding:14px 16px;display:flex;justify-content:space-between;align-items:center}
-.logo{display:flex;align-items:center;gap:10px;font-weight:bold;font-size:20px}
-.logo-icon{background:#fff;color:#2a4bff;width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:900}
-.top{display:flex;justify-content:center;padding:16px}
-.mtn-tab{background:#ffcc00;color:#000;border:none;padding:10px 28px;border-radius:24px;font-weight:800}
-.meta{display:flex;gap:18px;justify-content:center;color:#888;font-size:13px;padding-bottom:8px}
-.card{background:#ffcc00;color:#000;margin:15px auto;max-width:95%;width:360px;border-radius:20px;padding:14px;box-sizing:border-box}
+.header{background:#1a3cff;padding:14px 16px;display:flex;align-items:center;justify-content:space-between}
+.logo{display:flex;align-items:center;gap:10px;font-weight:800;font-size:19px;letter-spacing:0.2px}
+.logo-icon{background:#fff;color:#1a3cff;width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:900}
+.top{display:flex;justify-content:center;padding:14px 0 6px 0}
+.mtn-tab{background:#ffcc00;color:#000;border:none;padding:9px 26px;border-radius:20px;font-weight:900;font-size:14px;box-shadow:0 2px 6px rgba(0,0,0,0.3)}
+.meta{display:flex;gap:14px;justify-content:center;color:#9a9a9a;font-size:11px;padding:6px 0 10px 0}
+.grid{padding-bottom:80px;display:flex;flex-direction:column;align-items:center}
+.card{background:#ffcc00;color:#000;margin:8px auto;width:88%;max-width:300px;border-radius:18px;padding:14px;border:1.5px solid #000;box-sizing:border-box;box-shadow:0 3px 8px rgba(0,0,0,0.25)}
 .card-top{display:flex;justify-content:space-between;align-items:center}
-.tag{border:1.6px solid #000;border-radius:18px;padding:5px 12px;font-size:11px;font-weight:800}
-.size{font-size:40px;font-weight:900;margin:8px 0 0 0;line-height:1}
-.sub{margin:0;font-weight:600}
-.price{font-size:13px;font-weight:600;margin-top:4px;display:block;}
-.valid{float:right;margin-top:-22px;font-size:13px;font-weight:600}
-.phone{width:100%;padding:14px;border-radius:10px;border:1.6px solid #000;margin-top:14px;box-sizing:border-box;font-size:15px;display:block}
-.buy{width:100%;background:#000;color:#ffcc00;border:none;padding:16px;border-radius:12px;font-weight:bold;margin-top:10px;display:block}
-.wa{position:fixed;bottom:22px;right:18px;background:#25d366;color:#fff;width:58px;height:58px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:30px;text-decoration:none;box-shadow:0 4px 12px rgba(0,0,0,0.4)}
+.tag{border:1.5px solid #000;border-radius:14px;padding:3px 10px;font-size:10px;font-weight:900;letter-spacing:0.5px}
+.size{font-size:40px;font-weight:900;margin:10px 0 0 0;line-height:1}
+.sub{margin:2px 0 0 0;font-weight:600;font-size:12px;opacity:0.9}
+.price{font-size:22px;font-weight:900;margin-top:12px}
+.valid{font-size:11px;font-weight:700;float:right;margin-top:-18px;background:#000;color:#ffcc00;padding:3px 8px;border-radius:10px}
+.phone{width:100%;padding:12px;border-radius:10px;border:1.5px solid #000;margin-top:12px;box-sizing:border-box;font-size:15px;background:#fff;outline:none}
+.buy{width:100%;background:#000;color:#ffcc00;border:none;padding:13px;border-radius:10px;font-weight:900;font-size:14px;margin-top:10px;letter-spacing:0.3px}
+.wa{position:fixed;bottom:18px;right:14px;background:#25d366;color:#fff;width:52px;height:52px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:26px;text-decoration:none;box-shadow:0 4px 10px rgba(0,0,0,0.4)}
 </style>
 </head>
 <body>
-<div class="header"><div class="logo"><div class="logo-icon">K</div>KhobbyBryt</div></div>
-<div class="top"><button class="mtn-tab">MTN</button></div>
-<div class="meta"><span>10 bundles</span><span> Fast delivery</span><span> Secure</span></div>
+<div class="header"><div class="logo"><div class="logo-icon">K</div>KhobbyBryt Data</div></div>
+<div class="top"><button class="mtn-tab">MTN • 90 Days Validity</button></div>
+<div class="meta"><span>10 bundles</span><span>• Instant delivery</span><span>• Secure Paystack</span></div>
+<div class="grid">
 {% for b in bundles %}
 <div class="card">
-<div class="card-top"><span class="tag">MTN</span</div>
+<div class="card-top"><span class="tag">MTN</span></div>
 <div class="size">{{ b.size }}</div>
-<div class="sub">MTN Bundle</div>
-<div class="price">¢{{ b.price }}</div><div class="valid">{{ b.valid }}</div>
+<div class="sub">MTN Bundle - Non Expiry</div>
+<div class="price">GHS {{ b.price }}</div><div class="valid">{{ b.valid }}</div>
 <form action="/pay" method="post">
 <input type="hidden" name="bundle" value="{{ b.size }}">
 <input type="hidden" name="price" value="{{ b.price }}">
-<input class="phone" type="tel" name="phone" placeholder="Enter MTN number e.g 0532738647" required>
+<input type="hidden" name="capacity" value="{{ b.cap }}">
+<input class="phone" type="tel" name="phone" placeholder="0532738647" required>
 <button class="buy" type="submit">Buy Now</button>
 </form>
 </div>
 {% endfor %}
-<a class="wa" href="https://wa.me/233205411065">💬</a>
+</div>
+<a class="wa" href="https://wa.me/233532738647">💬</a>
 </body>
 </html>
 """
@@ -100,21 +102,47 @@ def home():
 def pay():
     phone = request.form.get("phone", "").strip()
     bundle = request.form.get("bundle", "1GB")
+    capacity = request.form.get("capacity", "1")
     price = float(request.form.get("price", "4.8"))
     if not PAYSTACK_SECRET:
-        return f"<h3 style='font-family:Arial;text-align:center'>PAYSTACK_SECRET not set in Render. Test order saved: {phone} {bundle} GHS {price}<br><a href='/'>Home</a></h3>"
+        return "<h3 style='font-family:Arial;text-align:center'>PAYSTACK_SECRET_KEY missing<br><a href='/'>Home</a></h3>"
     headers = {"Authorization": f"Bearer {PAYSTACK_SECRET}", "Content-Type": "application/json"}
-    data = {
-        "email": f"{phone}@khobbydata.com",
-        "amount": int(price * 100),
-        "metadata": {"phone": phone, "bundle": bundle, "network": "mtn"},
-        "callback_url": "https://khobbydata.onrender.com/success"
-    }
+    data = {"email": f"{phone}@khobbydata.com", "amount": int(price * 100), "metadata": {"phone": phone, "bundle": bundle, "capacity": capacity, "network": "MTN"}, "callback_url": f"{request.host_url}success"}
     r = requests.post("https://api.paystack.co/transaction/initialize", json=data, headers=headers, timeout=20)
     res = r.json()
     if res.get("status"):
         return redirect(res["data"]["authorization_url"])
     return f"Paystack error: {res} <a href='/'>Home</a>"
+
+@app.route("/success")
+def success():
+    ref = request.args.get("reference", "")
+    if PAYSTACK_SECRET and ref:
+        try:
+            headers = {"Authorization": f"Bearer {PAYSTACK_SECRET}"}
+            vr = requests.get(f"https://api.paystack.co/transaction/verify/{ref}", headers=headers, timeout=20)
+            vj = vr.json()
+            if vj.get("status"):
+                data = vj.get("data", {})
+                meta = data.get("metadata", {})
+                phone = meta.get("phone", "")
+                capacity = meta.get("capacity", "1")
+                bundle = meta.get("bundle", "1GB")
+                price = data.get("amount", 0) / 100
+                if DATAPLAZA_API_KEY and phone:
+                    payload = {"phoneNumber": phone, "network": "MTN", "capacity": str(capacity), "gateway": "wallet"}
+                    h2 = {"Authorization": f"Bearer {DATAPLAZA_API_KEY}", "Content-Type": "application/json", "X-Idempotency-Key": str(uuid.uuid4())}
+                    url = f"{DATAPLAZA_BASE}/api/data/buy"
+                    try:
+                        requests.post(url, json=payload, headers=h2, timeout=30)
+                    except:
+                        pass
+                orders = load_orders()
+                orders.append({"time": datetime.now().isoformat(), "phone": phone, "bundle": bundle, "price": price, "reference": ref})
+                save_orders(orders)
+        except:
+            pass
+    return "<div style='text-align:center;margin-top:80px;font-family:Arial'><h1>✅ Payment Successful</h1><p>Data will be delivered soon</p><a href='/'>Home</a></div>"
 
 @app.route("/paystack/webhook", methods=["POST"])
 def webhook():
@@ -123,67 +151,21 @@ def webhook():
         if payload.get("event") == "charge.success":
             d = payload.get("data", {})
             meta = d.get("metadata", {})
-            phone = meta.get("phone") or d.get("customer", {}).get("email") or "UNKNOWN"
-            order = {
-                "time": datetime.now().isoformat(),
-                "phone": phone,
-                "bundle": meta.get("bundle", "1GB"),
-                "network": "mtn",
-                "price": d.get("amount", 0) / 100,
-                "reference": d.get("reference", "")
-            }
             orders = load_orders()
-            orders.append(order)
+            orders.append({"time": datetime.now().isoformat(), "phone": meta.get("phone", ""), "bundle": meta.get("bundle", ""), "price": d.get("amount", 0) / 100, "reference": d.get("reference", "")})
             save_orders(orders)
-    except Exception as e:
-        print("webhook error", e)
+    except:
+        pass
     return jsonify({"status": "ok"}), 200
 
 @app.route("/admin")
 def admin():
     if request.args.get("pin") != ADMIN_PIN:
-        return """<div style='text-align:center;margin-top:100px;font-family:Arial'>
-        <h2>Enter PIN</h2><input type='password' id='p' style='padding:10px'>
-        <button onclick="location.href='/admin?pin='+document.getElementById('p').value" style='padding:10px'>Enter</button></div>"""
+        return """<div style='text-align:center;margin-top:100px;font-family:Arial'><h2>Enter PIN</h2><input type='password' id='p' style='padding:10px'><br><br><button onclick="location.href='/admin?pin='+document.getElementById('p').value" style='padding:10px 20px'>Enter</button></div>"""
     orders = load_orders()
     total = sum(float(o.get("price", 0)) for o in orders)
-    rows = ""
-    for o in reversed(orders):
-        rows += f"<tr><td>{o.get('time','')[:19]}</td><td>{o.get('phone','')}</td><td>{o.get('bundle','')}</td><td>{o.get('price','')}</td></tr>"
-    return f"<body style='background:#111;color:#fff;font-family:Arial;padding:12px'><h3>{len(orders)} Orders | GHS {total}</h3><table border=1 style='border-collapse:collapse;width:100%'><tr><th>Time</th><th>Phone</th><th>Bundle</th><th>Price</th></tr>{rows}</table></body>"
+    rows = "".join([f"<tr><td>{o.get('time','')[:19]}</td><td>{o.get('phone','')}</td><td>{o.get('bundle','')}</td><td>{o.get('price','')}</td></tr>" for o in reversed(orders)])
+    return f"<body style='background:#111;color:#fff;font-family:Arial;padding:12px'><h3>{len(orders)} Orders | GHS {total}</h3><table border=1 style='border-collapse:collapse;width:100%;font-size:13px'><tr><th>Time</th><th>Phone</th><th>Bundle</th><th>Price</th></tr>{rows}</table></body>"
 
-@app.route("/success")
-def success():
-    reference = request.args.get("reference")
-    phone = request.args.get("phone") or session.get("phone") or request.args.get('phoneNumber')
-    capacity = session.get("capacity", "1")  # 1 = 1GB, 2 = 2GB etc
-    
-    # 1. Verify Paystack
-    verify = requests.get(
-        f"https://api.paystack.co/transaction/verify/{reference}",
-        headers={"Authorization": f"Bearer {os.getenv('PAYSTACK_SECRET')}"}
-    )
-    print(f"PAYSTACK VERIFY: {verify.text}")
-
-    if verify.json().get("data", {}).get("status") == "success":
-        try:
-            payload = {
-                "phoneNumber": phone,  # must be 055xxxxxxx
-                "network": "MTN",    
-                "capacity": str(capacity),
-                "gateway": "wallet"
-            }
-            headers = {
-                "Authorization": f"Bearer {DATAPLAZA_API_KEY}", "Content-Type": "application/json","X-Idempotency-key":
-            str(uuid.uuid4())
-             }
-            url = f"{os.getenv('DATAPLAZA_BASE', 'https://dataplazagh.com')}/api/data/buy"
-            print(f"SENDING TO DATAPLAZA MTN: {payload}")
-            r = requests.post(url, json=payload, headers=headers, timeout=30)
-            print(f"DATAPLAZA RESPONSE: {r.status_code} {r.text}")
-        except Exception as e:
-            print(f"DATAPLAZA FAILED: {e}")
-
-    return "Payment Successful - Your MTN data will be delivered soon"
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 10000)))
