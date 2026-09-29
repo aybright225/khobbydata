@@ -11,6 +11,8 @@ app.secret_key = os.getenv("SECRET_KEY")
 ADMIN_PIN = "5329"
 ORDERS_FILE = "orders.json"
 PAYSTACK_SECRET = os.environ.get("PAYSTACK_SECRET_KEY").strip()
+DATAPLAZA_BASE  = os.getenv("DATAPLAZA_BASE", "https://dataplaza.com")
+DATAPLAZA_API_KEY = os.getenv("DATAPLAZA_API_KEY")
 
 # Your 10 MTN bundles - exact as you said
 MTN_BUNDLES = [
@@ -167,12 +169,12 @@ def success():
         try:
             payload = {
                 "phoneNumber": phone,  # must be 055xxxxxxx
-                "network": "MTN",    # MTN is always YELLO for DataMART
+                "network": "MTN",    
                 "capacity": str(capacity),
                 "gateway": "wallet"
             }
             headers = {
-                "Authorization": f"Bearer {os.getenv('DATAPLAZA_API_KEY')}", "Content-Type": "application/json","X-Idempotency-key":
+                "Authorization": f"Bearer {DATAPLAZA_API_KEY}", "Content-Type": "application/json","X-Idempotency-key":
             str(uuid.uuid4())
              }
             url = f"{os.getenv('DATAPLAZA_BASE', 'https://dataplazagh.com')}/api/data/buy"
