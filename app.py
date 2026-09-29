@@ -66,7 +66,20 @@ def pay(bid):
     amount = int(float(bundle["price"]) * 100)
     headers = {"Authorization": f"Bearer {PAYSTACK_SECRET}", "Content-Type": "application/json"}
     callback_url = f"{request.host_url}verify/{bundle['id']}/{phone}"
-    data = {"email": email, "amount": amount, "callback_url": callback_url, "metadata": {"phone": phone, "bundle_id": bundle["id"], "bundle_data": bundle["data"]}}
+data = {
+  "email": email,
+  "amount": int(amount * 100),
+  "metadata": {
+    "phone": phone_number,   # 05330081932
+    "network": network,      # mtn
+    "bundle": bundle_name,   # 2GB
+    "custom_fields": [
+      {"display_name": "Phone Number", "variable_name": "phone", "value": phone_number},
+      {"display_name": "Network", "variable_name": "network", "value": network}
+    ]
+  },
+  "callback_url": "https://khobbydata.onrender.com/success"
+}
     r = requests.post("https://api.paystack.co/transaction/initialize", json=data, headers=headers)
     j = r.json()
     if j.get("status"): return redirect(j["data"]["authorization_url"])
