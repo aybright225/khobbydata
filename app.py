@@ -5,6 +5,7 @@ import requests
 from datetime import datetime
 
 app = Flask(__name__)
+app.secret_key = os.getenv("SECRET_KEY", "sk_live_8ff88114eba916175997b515b071ebee0d9a8181")
 
 # === CONFIG ===
 ADMIN_PIN = "5329"
@@ -152,9 +153,9 @@ def admin():
 @app.route("/success")
 def success():
     reference = request.args.get("reference")
-    phone = request.args.get("phone") or session.get("phone")
+    phone = request.args.get("phone") or session.get("phone") or request.args.get('phoneNumber')
     capacity = session.get("capacity", "1")  # 1 = 1GB, 2 = 2GB etc
-
+    
     # 1. Verify Paystack
     verify = requests.get(
         f"https://api.paystack.co/transaction/verify/{reference}",
