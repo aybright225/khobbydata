@@ -5,7 +5,7 @@ import requests
 from datetime import datetime
 
 app = Flask(__name__)
-app.secret_key = os.getenv("SECRET_KEY", "sk_live_8ff88114eba916175997b515b071ebee0d9a8181")
+app.secret_key = os.getenv("SECRET_KEY")
 
 # === CONFIG ===
 ADMIN_PIN = "5329"
@@ -68,12 +68,12 @@ body{margin:0;background:#0f0f0f;color:#fff;font-family:Arial}
 </style>
 </head>
 <body>
-<div class="header"><div class="logo"><div class="logo-icon">K</div>KhobbyBryt</div><div>☀️</div></div>
+<div class="header"><div class="logo"><div class="logo-icon">K</div>KhobbyBryt</div></div>
 <div class="top"><button class="mtn-tab">MTN</button></div>
-<div class="meta"><span>10 bundles</span><span>⚡ Fast delivery</span><span>🛡️ Secure</span></div>
+<div class="meta"><span>10 bundles</span><span> Fast delivery</span><span> Secure</span></div>
 {% for b in bundles %}
 <div class="card">
-<div class="card-top"><span class="tag">MTN</span><span>▼</span></div>
+<div class="card-top"><span class="tag">MTN</span</div>
 <div class="size">{{ b.size }}</div>
 <div class="sub">MTN Bundle</div>
 <div class="price">¢{{ b.price }}</div><div class="valid">{{ b.valid }}</div>
@@ -85,7 +85,7 @@ body{margin:0;background:#0f0f0f;color:#fff;font-family:Arial}
 </form>
 </div>
 {% endfor %}
-<a class="wa" href="https://wa.me/233532738647">💬</a>
+<a class="wa" href="https://wa.me/233205411065">💬</a>
 </body>
 </html>
 """
@@ -167,21 +167,20 @@ def success():
         try:
             payload = {
                 "phoneNumber": phone,  # must be 055xxxxxxx
-                "network": "YELLO",    # MTN is always YELLO for DataMART
+                "network": "MTN",    # MTN is always YELLO for DataMART
                 "capacity": str(capacity),
                 "gateway": "wallet"
             }
             headers = {
-                "X-API-Key": os.getenv("DATAMART_API_KEY"),
-                "Content-Type": "application/json",
-                "X-Idempotency-Key": str(uuid.uuid4())
-            }
-            url = f"{os.getenv('DATAMART_BASE')}/purchase"
-            print(f"SENDING TO DATAMART MTN: {payload}")
+                "Authorization": f"Bearer {os.getenv('DATAPLAZA_API_KEY')}", "Content-Type": "application/json","X-Idempotency-key":
+            str(uuid.uuid4())
+             }
+            url = f"{os.getenv('DATAPLAZA_BASE', 'https://dataplazagh.com')}/api/data/buy"
+            print(f"SENDING TO DATAPLAZA MTN: {payload}")
             r = requests.post(url, json=payload, headers=headers, timeout=30)
-            print(f"DATAMART RESPONSE: {r.status_code} {r.text}")
+            print(f"DATAPLAZA RESPONSE: {r.status_code} {r.text}")
         except Exception as e:
-            print(f"DATAMART FAILED: {e}")
+            print(f"DATAPLAZA FAILED: {e}")
 
     return "Payment Successful - Your MTN data will be delivered soon"
 if __name__ == "__main__":
