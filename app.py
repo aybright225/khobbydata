@@ -157,6 +157,10 @@ def paystack_webhook():
     print(f"PAYSTACK WEBHOOK RECEIVED: {data}")
     return jsonify({"status": "ok"}), 200
 
+@app.route('/health')
+def health():
+    return "ok", 200
+
 @app.route('/sitemap.xml')
 def sitemap():
     return """<?xml version="1.0" encoding="UFT-8"?>
