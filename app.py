@@ -54,12 +54,12 @@ body{margin:0;background:#0f0f0f;color:#fff;font-family:Arial}
 .top{display:flex;justify-content:center;padding:16px}
 .mtn-tab{background:#ffcc00;color:#000;border:none;padding:10px 28px;border-radius:24px;font-weight:800}
 .meta{display:flex;gap:18px;justify-content:center;color:#888;font-size:13px;padding-bottom:8px}
-.card{background:#ffcc00;color:#000;margin:14px;border-radius:22px;padding:18px}
+.card{background:#ffcc00;color:#000;margin:10px auto;max-width:320px;border-radius:20px;padding:14px}
 .card-top{display:flex;justify-content:space-between;align-items:center}
 .tag{border:1.6px solid #000;border-radius:18px;padding:5px 12px;font-size:11px;font-weight:800}
-.size{font-size:58px;font-weight:900;margin:12px 0 0 0;line-height:1}
+.size{font-size:40px;font-weight:900;margin:8px 0 0 0;line-height:1}
 .sub{margin:0;font-weight:600}
-.price{font-size:34px;font-weight:900;margin-top:18px}
+.price{font-size:26px;font-weight:900;margin-top:10px}
 .valid{float:right;margin-top:-22px;font-size:13px;font-weight:600}
 .phone{width:100%;padding:14px;border-radius:10px;border:1.6px solid #000;margin-top:14px;box-sizing:border-box;font-size:15px}
 .buy{width:100%;background:#000;color:#ffcc00;border:none;padding:16px;border-radius:12px;font-weight:800;font-size:16px;margin-top:14px}
