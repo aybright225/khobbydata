@@ -121,36 +121,45 @@ DATAPLAZA_BASE = "https://dataplazagh.com/api/v1"
 
 
 def send_dataplaza(phone, gb):
-    try:
-        import uuid, os
-        key = os.getenv("DATAPLAZA_API_KEY","").strip()
-        print(f"KEY CHECK len={len(key)} first5={key[:5]}", flush=True)
-
-        vol_mb = int(str(gb).replace("GB","").replace("gb","").strip()) * 1000
-        url = "https://dataplazagh.com/api/v1/orders/bulk"
-        
-        headers = {
-            "Content-Type": "application/json",
-            "Idempotency-Key": str(uuid.uuid4()),
-            "Authorization": f"Bearer {key}",
-            "X-API-KEY": key,
-            "api-key": key,
-            "x-api-key": key
-        }
-        
-        payload = {
-            "network_id": int(os.getenv("MTN_NETWORK_ID","1")),
-            "recipients": [{"msisdn": phone, "volume_mb": vol_mb}]
-        }
-        
-        print(f"DATAPLAZA CALL {payload}", flush=True)
-        r = requests.post(url, json=payload, headers=headers, timeout=30)
-        print(f"DATAPLAZA FINAL {r.status_code} {r.text}", flush=True)
-        return r.status_code in [200,201], r.text
-    except Exception as e:
-        print(f"DATAPLAZA ERROR {e}", flush=True)
-        return False, str(e)
-
+    key = os.getenv("DATAPLAZA_API_KEY","").strip()
+    print(f"KEY CHECK len={len(key)}", flush=True)
+    
+    vol_mb = int(str(gb).replace("GB","").strip()) * 1000
+    
+    urls_to_try = [
+        "https://dataplazagh.com/api/v1/data/order",
+        "https://dataplazagh.com/api/v1/orders",
+        "https://dataplazagh.com/api/v1/orders/bulk",
+        "https://api.dataplazagh.com/api/v1/orders/bulk",
+        "https://dataplazagh.com/api/orders",
+    ]
+    
+    headers = {
+        "Content-Type": "application/json",
+        "Authorization": f"Bearer {key}",
+        "X-API-KEY": key,
+        "x-api-key": key,
+        "api-key": key,
+    }
+    
+    payload = {
+        "network_id": 1,
+        "recipients": [{"msisdn": phone, "volume_mb": vol_mb}]
+    }
+    
+    for url in urls_to_try:
+        try:
+            print(f"TRYING {url}", flush=True)
+            r = requests.post(url, json=payload, headers=headers, timeout=20)
+            print(f"RESULT {url} -> {r.status_code} {r.text[:800]}", flush=True)
+            if "success" in r.text.lower() or r.status_code in [200,201]:
+                # if not HTML
+                if "<!DOCTYPE" not in r.text:
+                    return True, r.text
+        except Exception as e:
+            print(f"ERROR {url}: {e}", flush=True)
+    
+    return False, "All URLs failed - check logs"
 @app.route("/success")
 def success():
     ref = request.args.get("reference", "") or request.args.get("trxref", "")
