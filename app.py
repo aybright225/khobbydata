@@ -203,5 +203,18 @@ def admin():
     rows = "".join([f"<tr><td>{o.get('time','')[:19]}</td><td>{o.get('phone','')}</td><td>{o.get('bundle','')}</td><td>{o.get('price','')}</td></tr>" for o in reversed(orders)])
     return f"<body style='background:#111;color:#fff;font-family:Arial;padding:12px'><h3>{len(orders)} Orders | GHS {total}</h3><table border=1 style='border-collapse:collapse;width:100%;font-size:13px'><tr><th>Time</th><th>Phone</th><th>Bundle</th><th>Price</th></tr>{rows}</table></body>"
 
+@app.route("/test-mtn")
+def test_mtn():
+    import requests, os
+    key = os.getenv("DATAPLAZA_API_KEY")
+    payload = {
+        "msisdn": "0533081932",
+        "volume_mb": 1000,
+        "network_id": 3
+    }
+    headers = {"Authorization": f"Bearer {key}", "Content-Type": "application/json"}
+    r = requests.post("https://dataplazagh.com/api/v1/orders", json=payload, headers=headers, timeout=20)
+    return f"Status: {r.status_code}<br>Response: {r.text}<br>Key ending: ...{key[-4:]}"
+
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 10000)))
