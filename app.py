@@ -6,24 +6,21 @@ from datetime import datetime
 
 app = Flask(__name__)
 
-# === CONFIG ===
 ADMIN_PIN = "5329"
 ORDERS_FILE = "orders.json"
 PAYSTACK_SECRET = os.environ.get("PAYSTACK_SECRET", "").strip()
-DATAPLAZA_KEY = os.environ.get("DATAPLAZA_API_KEY", "").strip()
 
-# Your 10 MTN bundles
 MTN_BUNDLES = [
-    {"size": "1GB", "price": 4.7, "valid": "90 days"},
-    {"size": "2GB", "price": 9.5, "valid": "90 days"},
-    {"size": "3GB", "price": 14.5, "valid": "90 days"},
-    {"size": "4GB", "price": 19.4, "valid": "90 days"},
+    {"size": "1GB", "price": 4.8, "valid": "90 days"},
+    {"size": "2GB", "price": 9.7, "valid": "90 days"},
+    {"size": "3GB", "price": 14.6, "valid": "90 days"},
+    {"size": "4GB", "price": 19.5, "valid": "90 days"},
     {"size": "5GB", "price": 24.0, "valid": "90 days"},
-    {"size": "6GB", "price": 28.5, "valid": "90 days"},
-    {"size": "8GB", "price": 37.5, "valid": "90 days"},
-    {"size": "10GB", "price": 47.5, "valid": "90 days"},
+    {"size": "6GB", "price": 29.0, "valid": "90 days"},
+    {"size": "8GB", "price": 39.0, "valid": "90 days"},
+    {"size": "10GB", "price": 49.5, "valid": "90 days"},
     {"size": "15GB", "price": 70.0, "valid": "90 days"},
-    {"size": "20GB", "price": 94.2, "valid": "90 days"},
+    {"size": "20GB", "price": 95.0, "valid": "90 days"},
 ]
 
 def load_orders():
@@ -48,7 +45,7 @@ PAGE_HTML = """
 <title>KhobbyBryt Data</title>
 <style>
 body{margin:0;background:#0f0f0f;color:#fff;font-family:Arial}
-.header{background:#2a4bff;padding:12px 14px;display:flex;justify-content:space-between;align-items:center}
+.header{background:#2a4bff;padding:12px 14px;display:flex;align-items:center}
 .logo{display:flex;align-items:center;gap:8px;font-weight:bold;font-size:18px}
 .logo-icon{background:#fff;color:#2a4bff;width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:900}
 .top{display:flex;justify-content:center;padding:12px}
@@ -98,22 +95,25 @@ def pay():
     phone = request.form.get("phone", "").strip()
     bundle = request.form.get("bundle", "1GB")
     price = float(request.form.get("price", "4.8"))
-if not PAYSTACK_SECRET:
-    PAYSTACK_SECRET = os.environ.get("PAYSTACK_SECRET_KEY", "").strip() or os.environ.get("PAYSTACK_SECRET", "").strip()
-    headers = {"Authorization": f"Bearer {PAYSTACK_SECRET}", "Content-Type": "application/json"}
+    secret = os.environ.get("PAYSTACK_SECRET", "").strip()
+    if not secret:
+        secret = PAYSTACK_SECRET
+    headers = {"Authorization": f"Bearer {secret}", "Content-Type": "application/json"}
     data = {
         "email": f"{phone}@khobbydata.com",
         "amount": int(price * 100),
         "metadata": {"phone": phone, "bundle": bundle, "network": "mtn"},
         "callback_url": "https://khobbydata.onrender.com/success"
     }
-    r = requests.post("https://api.paystack.co/transaction/initialize", json=data, headers=headers, timeout=20)
-    res = r.json()
-    if res.get("status"):
-        return redirect(res["data"]["authorization_url"])
-    return f"Paystack error: {res} <a href='/'>Home</a>"
+    try:
+        r = requests.post("https://api.paystack.co/transaction/initialize", json=data, headers=headers, timeout=20)
+        res = r.json()
+        if res.get("status") and res["data"].get("authorization_url"):
+            return redirect(res["data"]["authorization_url"])
+        return f"Paystack error: {res} <br><a href='/'>Home</a>"
+    except Exception as e:
+        return f"Connection error: {e} <br><a href='/'>Home</a>"
 
-# THIS IS WHERE I ADDED MANUAL MODE
 @app.route("/paystack/webhook", methods=["POST"])
 def webhook():
     payload = request.get_json(silent=True) or {}
@@ -121,9 +121,8 @@ def webhook():
         if payload.get("event") == "charge.success":
             d = payload.get("data", {})
             meta = d.get("metadata", {})
-            phone = meta.get("phone") or d.get("customer", {}).get("email") or "UNKNOWN"
+            phone = meta.get("phone") or "UNKNOWN"
             bundle = meta.get("bundle", "1GB")
-            # Save order first
             order = {
                 "time": datetime.now().isoformat(),
                 "phone": phone,
@@ -136,24 +135,6 @@ def webhook():
             orders = load_orders()
             orders.append(order)
             save_orders(orders)
-
-            # Try to send to DataPlaza - but don't fail if their DB is broken
-            try:
-                if DATAPLAZA_KEY:
-                    vol = int(bundle.replace("GB","").strip())
-                    # DataPlaza uses MB
-                    mb = vol * 1000
-                    headers = {"Authorization": f"Bearer {DATAPLAZA_KEY}", "X-API-KEY": DATAPLAZA_KEY, "Content-Type": "application/json"}
-                    pd = {"msisdn": phone, "volume_mb": mb, "network_id": 3}
-                    rr = requests.post("https://dataplazagh.com/api/v1/orders", json=pd, headers=headers, timeout=25)
-                    print(f"DATAPLAZA TRY: {rr.status_code} {rr.text[:500]}")
-                    if rr.status_code == 200:
-                        order["status"] = "sent_to_dataplaza"
-                        save_orders(orders)
-            except Exception as e:
-                print(f"DATAPLAZA EXCEPTION: {e}")
-                # still keep as pending_manual - you will buy manually
-
     except Exception as e:
         print("webhook error", e)
     return jsonify({"status": "ok"}), 200
@@ -161,17 +142,13 @@ def webhook():
 @app.route("/admin")
 def admin():
     if request.args.get("pin") != ADMIN_PIN:
-        return """<div style='text-align:center;margin-top:100px;font-family:Arial'>
-        <h2>Enter PIN</h2><input type='password' id='p' style='padding:10px'>
-        <button onclick="location.href='/admin?pin='+document.getElementById('p').value" style='padding:10px'>Enter</button></div>"""
+        return "<div style='text-align:center;margin-top:100px;font-family:Arial'><h2>Enter PIN</h2><input type='password' id='p' style='padding:10px'><button onclick=\"location.href='/admin?pin='+document.getElementById('p').value\" style='padding:10px'>Enter</button></div>"
     orders = load_orders()
     total = sum(float(o.get("price", 0)) for o in orders)
     rows = ""
     for o in reversed(orders):
-        st = o.get('status','')
-        color = "#ffcc00" if "pending" in st else "#0f0"
-        rows += f"<tr><td>{o.get('time','')[:19]}</td><td>{o.get('phone','')}</td><td>{o.get('bundle','')}</td><td>{o.get('price','')}</td><td style='color:{color}'>{st}</td></tr>"
-    return f"<body style='background:#111;color:#fff;font-family:Arial;padding:12px'><h3>{len(orders)} Orders | GHS {total}</h3><p style='color:#ffcc00'>YELLOW = Buy manually on dataplazagh.com</p><table border=1 style='border-collapse:collapse;width:100%'><tr><th>Time</th><th>Phone</th><th>Bundle</th><th>Price</th><th>Status</th></tr>{rows}</table></body>"
+        rows += f"<tr><td>{o.get('time','')[:19]}</td><td>{o.get('phone','')}</td><td>{o.get('bundle','')}</td><td>{o.get('price','')}</td><td>{o.get('status','')}</td></tr>"
+    return f"<body style='background:#111;color:#fff;font-family:Arial;padding:12px'><h3>{len(orders)} Orders | GHS {total}</h3><table border=1 style='border-collapse:collapse;width:100%'><tr><th>Time</th><th>Phone</th><th>Bundle</th><th>Price</th><th>Status</th></tr>{rows}</table></body>"
 
 @app.route("/success")
 def success():
