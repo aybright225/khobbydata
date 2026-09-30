@@ -98,8 +98,8 @@ def pay():
     phone = request.form.get("phone", "").strip()
     bundle = request.form.get("bundle", "1GB")
     price = float(request.form.get("price", "4.8"))
-    if not PAYSTACK_SECRET:
-        return f"<h3 style='font-family:Arial;text-align:center'>PAYSTACK_SECRET not set. <a href='/'>Home</a></h3>"
+if not PAYSTACK_SECRET:
+    PAYSTACK_SECRET = os.environ.get("PAYSTACK_SECRET_KEY", "").strip() or os.environ.get("PAYSTACK_SECRET", "").strip()
     headers = {"Authorization": f"Bearer {PAYSTACK_SECRET}", "Content-Type": "application/json"}
     data = {
         "email": f"{phone}@khobbydata.com",
