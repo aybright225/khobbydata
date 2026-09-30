@@ -133,7 +133,7 @@ def success():
 
 @app.route("/check")
 def check():
-    s = os.environ.get("PAYSTACK_SECRET","")
+    s = os.environ.get("PAYSTACK_SECRET_KEY","").strip()
     return f"KEY length={len(s)} start={s[:7]} end={s[-4:]} has_sk={s.startswith('sk_')}"
 
 if __name__ == "__main__":
