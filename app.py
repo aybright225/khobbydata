@@ -48,38 +48,38 @@ PAGE_HTML = """
 <title>KhobbyBryt Data</title>
 <style>
 body{margin:0;background:#0f0f0f;color:#fff;font-family:Arial}
-.header{background:#2a4bff;padding:14px 16px;display:flex;justify-content:space-between;align-items:center}
-.logo{display:flex;align-items:center;gap:10px;font-weight:bold;font-size:20px}
-.logo-icon{background:#fff;color:#2a4bff;width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:900}
-.top{display:flex;justify-content:center;padding:16px}
-.mtn-tab{background:#ffcc00;color:#000;border:none;padding:10px 28px;border-radius:24px;font-weight:800}
-.meta{display:flex;gap:18px;justify-content:center;color:#888;font-size:13px;padding-bottom:8px}
-.card{background:#ffcc00;color:#000;margin:14px;border-radius:22px;padding:18px}
+.header{background:#2a4bff;padding:12px 14px;display:flex;justify-content:space-between;align-items:center}
+.logo{display:flex;align-items:center;gap:8px;font-weight:bold;font-size:18px}
+.logo-icon{background:#fff;color:#2a4bff;width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:900}
+.top{display:flex;justify-content:center;padding:12px}
+.mtn-tab{background:#ffcc00;color:#000;border:none;padding:8px 22px;border-radius:20px;font-weight:800;font-size:13px}
+.meta{display:flex;gap:14px;justify-content:center;color:#888;font-size:11px;padding-bottom:6px}
+.card{background:#ffcc00;color:#000;margin:10px auto;border-radius:18px;padding:14px;max-width:320px;width:90%}
 .card-top{display:flex;justify-content:space-between;align-items:center}
-.tag{border:1.6px solid #000;border-radius:18px;padding:5px 12px;font-size:11px;font-weight:800}
-.size{font-size:58px;font-weight:900;margin:12px 0 0 0;line-height:1}
-.sub{margin:0;font-weight:600}
-.price{font-size:34px;font-weight:900;margin-top:18px}
-.valid{float:right;margin-top:-22px;font-size:13px;font-weight:600}
-.phone{width:100%;padding:14px;border-radius:10px;border:1.6px solid #000;margin-top:14px;box-sizing:border-box;font-size:15px}
-.buy{width:100%;background:#000;color:#ffcc00;border:none;padding:16px;border-radius:12px;font-weight:800;font-size:16px;margin-top:14px}
-.wa{position:fixed;bottom:22px;right:18px;background:#25d366;color:#fff;width:58px;height:58px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:30px;text-decoration:none}
+.tag{border:1.4px solid #000;border-radius:16px;padding:4px 10px;font-size:10px;font-weight:800}
+.size{font-size:36px;font-weight:900;margin:8px 0 0 0;line-height:1}
+.sub{margin:2px 0 0 0;font-weight:600;font-size:13px}
+.price{font-size:26px;font-weight:900;margin-top:12px}
+.valid{float:right;margin-top:-18px;font-size:11px;font-weight:600}
+.phone{width:100%;padding:12px;border-radius:8px;border:1.4px solid #000;margin-top:10px;box-sizing:border-box;font-size:13px}
+.buy{width:100%;background:#000;color:#ffcc00;border:none;padding:13px;border-radius:10px;font-weight:800;font-size:14px;margin-top:10px}
+.wa{position:fixed;bottom:18px;right:14px;background:#25d366;color:#fff;width:50px;height:50px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:26px;text-decoration:none}
 </style>
 </head>
 <body>
-<div class="header"><div class="logo"><div class="logo-icon">K</div>KhobbyBryt</div><div>☀️</div></div>
+<div class="header"><div class="logo"><div class="logo-icon">K</div>KhobbyBryt</div></div>
 <div class="top"><button class="mtn-tab">MTN</button></div>
 <div class="meta"><span>10 bundles</span><span>⚡ Fast delivery</span><span>🛡️ Secure</span></div>
 {% for b in bundles %}
 <div class="card">
-<div class="card-top"><span class="tag">MTN</span><span>▼</span></div>
+<div class="card-top"><span class="tag">MTN</span></div>
 <div class="size">{{ b.size }}</div>
 <div class="sub">MTN Bundle</div>
 <div class="price">¢{{ b.price }}</div><div class="valid">{{ b.valid }}</div>
 <form action="/pay" method="post">
 <input type="hidden" name="bundle" value="{{ b.size }}">
 <input type="hidden" name="price" value="{{ b.price }}">
-<input class="phone" type="tel" name="phone" placeholder="Enter MTN number e.g 0532738647" required>
+<input class="phone" type="tel" name="phone" placeholder="0532738647" required>
 <button class="buy" type="submit">Buy Now</button>
 </form>
 </div>
