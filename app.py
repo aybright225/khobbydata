@@ -15,7 +15,7 @@ DATAPLAZA_BASE = "https://dataplazagh.com/api/v1"
 DATAPLAZA_API_KEY = (os.getenv("DATAPLAZA_API_KEY") or "").strip()
 
 # DataPlaza network_id: 1=MTN, 2=Telecel, 3=AT - your screenshot shows 3 but MTN is usually 1. We try 1.
-MTN_NETWORK_ID = int(os.getenv("MTN_NETWORK_ID", "1"))
+MTN_NETWORK_ID = int(os.getenv("MTN_NETWORK_ID", "3"))
 
 MTN_BUNDLES = [
     {"size": "1GB", "price": 4.7, "cap": 1, "valid": "90 days"},
