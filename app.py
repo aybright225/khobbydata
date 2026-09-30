@@ -206,15 +206,16 @@ def admin():
 @app.route("/test-mtn")
 def test_mtn():
     import requests, os
-    key = os.getenv("DATAPLAZA_API_KEY")
-    payload = {
-        "msisdn": "0533081932",
-        "volume_mb": 1000,
-        "network_id": 3
+    key = os.getenv("DATAPLAZA_API_KEY", "").strip()
+    payload = {"msisdn": "0533081932", "volume_mb": 1000, "network_id": 3}
+    headers = {
+        "Authorization": f"Bearer {key}",
+        "X-API-KEY": key,
+        "api-key": key,
+        "Content-Type": "application/json"
     }
-    headers = {"Authorization": f"Bearer {key}", "Content-Type": "application/json"}
     r = requests.post("https://dataplazagh.com/api/v1/orders", json=payload, headers=headers, timeout=20)
-    return f"Status: {r.status_code}<br>Response: {r.text}<br>Key ending: ...{key[-4:]}"
+    return f"Status: {r.status_code}<br>Response: {r.text}<br>Key ending: ...{key[-4:]} Len:{len(key)}"
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 10000)))
