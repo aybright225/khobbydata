@@ -140,8 +140,6 @@ def send_dataplaza(phone, gb):
         "msisdn": phone,
         "volume_mb": vol_mb,
         "network_id": 3,  # 3=MTN
-        # try also with network name
-        "network": "MTN"
     }
     
     try:
