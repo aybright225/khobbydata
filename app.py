@@ -122,22 +122,30 @@ DATAPLAZA_BASE = "https://dataplazagh.com/api/v1"
 
 def send_dataplaza(phone, gb):
     try:
-        import uuid
-        vol_gb = int(str(gb).replace("GB","").replace("gb","").strip())
-        vol_mb = vol_gb * 1000
+        import uuid, os
+        key = os.getenv("DATAPLAZA_API_KEY","").strip()
+        print(f"KEY CHECK len={len(key)} first5={key[:5]}", flush=True)
+
+        vol_mb = int(str(gb).replace("GB","").replace("gb","").strip()) * 1000
         url = "https://dataplazagh.com/api/v1/orders/bulk"
+        
         headers = {
-            "Authorization": f"Bearer {DATAPLAZA_API_KEY}",
             "Content-Type": "application/json",
-            "Idempotency-Key": str(uuid.uuid4())
+            "Idempotency-Key": str(uuid.uuid4()),
+            "Authorization": f"Bearer {key}",
+            "X-API-KEY": key,
+            "api-key": key,
+            "x-api-key": key
         }
+        
         payload = {
-            "network_id": 1,  # 1 = MTN, check fetch-networks to confirm
+            "network_id": int(os.getenv("MTN_NETWORK_ID","1")),
             "recipients": [{"msisdn": phone, "volume_mb": vol_mb}]
         }
+        
         print(f"DATAPLAZA CALL {payload}", flush=True)
         r = requests.post(url, json=payload, headers=headers, timeout=30)
-        print(f"DATAPLAZA FINAL -> {r.status_code} {r.text}", flush=True)
+        print(f"DATAPLAZA FINAL {r.status_code} {r.text}", flush=True)
         return r.status_code in [200,201], r.text
     except Exception as e:
         print(f"DATAPLAZA ERROR {e}", flush=True)
