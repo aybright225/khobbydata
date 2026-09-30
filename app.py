@@ -120,7 +120,6 @@ def pay():
 DATAPLAZA_BASE = "https://dataplazagh.com/api/v1"
 
 def send_dataplaza(phone, gb):
-    import requests, os
     key = os.getenv("DATAPLAZA_API_KEY","").strip()
     print(f"KEY CHECK len={len(key)}", flush=True)
     
