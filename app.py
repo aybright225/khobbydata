@@ -14,7 +14,7 @@ PAYSTACK_PUBLIC = (os.environ.get("PAYSTACK_PUBLIC_KEY") or "").strip()
 DATAPLAZA_BASE = "https://dataplazagh.com/api/v1"
 DATAPLAZA_API_KEY = (os.getenv("DATAPLAZA_API_KEY") or "").strip()
 
-# DataPlaza network_id: 1=MTN, 2=Telecel, 3=AT - your screenshot shows 3 but MTN is usually 1. We try 1.
+# DataPlaza network_id: 3=MTN, 2=Telecel, 1=AT - your screenshot shows 3 but MTN is usually 1. We try 1.
 MTN_NETWORK_ID = int(os.getenv("MTN_NETWORK_ID", "3"))
 
 MTN_BUNDLES = [
@@ -139,7 +139,7 @@ def send_dataplaza(phone, gb):
     payload = {
         "msisdn": phone,
         "volume_mb": vol_mb,
-        "network_id": 1,  # 1=MTN
+        "network_id": 3,  # 3=MTN
         # try also with network name
         "network": "MTN"
     }
