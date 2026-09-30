@@ -119,47 +119,44 @@ def pay():
 
 DATAPLAZA_BASE = "https://dataplazagh.com/api/v1"
 
-
 def send_dataplaza(phone, gb):
+    import requests, os
     key = os.getenv("DATAPLAZA_API_KEY","").strip()
     print(f"KEY CHECK len={len(key)}", flush=True)
     
+    # Convert 1GB -> 1000, 2GB -> 2000 etc
     vol_mb = int(str(gb).replace("GB","").strip()) * 1000
     
-    urls_to_try = [
-        "https://dataplazagh.com/api/v1/data/order",
-        "https://dataplazagh.com/api/v1/orders",
-        "https://dataplazagh.com/api/v1/orders/bulk",
-        "https://api.dataplazagh.com/api/v1/orders/bulk",
-        "https://dataplazagh.com/api/orders",
-    ]
+    url = "https://dataplazagh.com/api/v1/orders"
     
     headers = {
         "Content-Type": "application/json",
         "Authorization": f"Bearer {key}",
         "X-API-KEY": key,
         "x-api-key": key,
-        "api-key": key,
     }
     
+    # SINGLE order format (not recipients array)
     payload = {
-        "network_id": 1,
-        "recipients": [{"msisdn": phone, "volume_mb": vol_mb}]
+        "msisdn": phone,
+        "volume_mb": vol_mb,
+        "network_id": 1,  # 1=MTN
+        # try also with network name
+        "network": "MTN"
     }
     
-    for url in urls_to_try:
-        try:
-            print(f"TRYING {url}", flush=True)
-            r = requests.post(url, json=payload, headers=headers, timeout=20)
-            print(f"RESULT {url} -> {r.status_code} {r.text[:800]}", flush=True)
-            if "success" in r.text.lower() or r.status_code in [200,201]:
-                # if not HTML
-                if "<!DOCTYPE" not in r.text:
-                    return True, r.text
-        except Exception as e:
-            print(f"ERROR {url}: {e}", flush=True)
-    
-    return False, "All URLs failed - check logs"
+    try:
+        print(f"CALLING {url} {payload}", flush=True)
+        r = requests.post(url, json=payload, headers=headers, timeout=20)
+        print(f"FINAL {r.status_code} {r.text[:1000]}", flush=True)
+        if r.status_code in [200,201]:
+            return True, r.text
+        else:
+            return False, r.text
+    except Exception as e:
+        print(f"ERROR {e}", flush=True)
+        return False, str(e)
+
 @app.route("/success")
 def success():
     ref = request.args.get("reference", "") or request.args.get("trxref", "")
