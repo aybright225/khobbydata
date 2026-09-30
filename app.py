@@ -14,16 +14,16 @@ DATAPLAZA_KEY = os.environ.get("DATAPLAZA_API_KEY", "").strip()
 
 # Your 10 MTN bundles
 MTN_BUNDLES = [
-    {"size": "1GB", "price": 4.8, "valid": "90 days"},
-    {"size": "2GB", "price": 9.7, "valid": "90 days"},
-    {"size": "3GB", "price": 14.6, "valid": "90 days"},
-    {"size": "4GB", "price": 19.5, "valid": "90 days"},
+    {"size": "1GB", "price": 4.7, "valid": "90 days"},
+    {"size": "2GB", "price": 9.5, "valid": "90 days"},
+    {"size": "3GB", "price": 14.5, "valid": "90 days"},
+    {"size": "4GB", "price": 19.4, "valid": "90 days"},
     {"size": "5GB", "price": 24.0, "valid": "90 days"},
-    {"size": "6GB", "price": 29.0, "valid": "90 days"},
-    {"size": "8GB", "price": 39.0, "valid": "90 days"},
-    {"size": "10GB", "price": 49.5, "valid": "90 days"},
+    {"size": "6GB", "price": 28.5, "valid": "90 days"},
+    {"size": "8GB", "price": 37.5, "valid": "90 days"},
+    {"size": "10GB", "price": 47.5, "valid": "90 days"},
     {"size": "15GB", "price": 70.0, "valid": "90 days"},
-    {"size": "20GB", "price": 95.0, "valid": "90 days"},
+    {"size": "20GB", "price": 94.2, "valid": "90 days"},
 ]
 
 def load_orders():
