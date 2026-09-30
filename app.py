@@ -117,26 +117,30 @@ def pay():
         return redirect(res["data"]["authorization_url"])
     return f"Paystack error: {res} <a href='/'>Home</a>"
 
+DATAPLAZA_BASE = "https://dataplazagh.com/api/v1"
+
+
 def send_dataplaza(phone, gb):
-    if not DATAPLAZA_API_KEY:
-        return False, "No API key"
-    # Clean phone - DataPlaza wants 024... or 233...
-    if phone.startswith("+"):
-        phone = phone[1:]
-    if len(phone) == 10 and phone.startswith("0"):
-        phone = phone  # keep as 0
-    headers = {"x-api-key": DATAPLAZA_API_KEY, "Content-Type": "application/json"}
-    payload = {
-        "network_id": MTN_NETWORK_ID,
-        "recipients": [{"msisdn": phone, "volume": int(str(gb).replace("GB","").strip())}]
-    }
     try:
-        url = f"{DATAPLAZA_BASE}/orders/bulk"
-        pr = requests.post(url, json=payload, headers=headers, timeout=30)
-        print(f"DATAPLAZA {pr.status_code} {pr.text}")
-        return True, pr.text
+        import uuid
+        vol_gb = int(str(gb).replace("GB","").replace("gb","").strip())
+        vol_mb = vol_gb * 1000
+        url = "https://dataplazagh.com/api/v1/orders/bulk"
+        headers = {
+            "Authorization": f"Bearer {DATAPLAZA_API_KEY}",
+            "Content-Type": "application/json",
+            "Idempotency-Key": str(uuid.uuid4())
+        }
+        payload = {
+            "network_id": 1,  # 1 = MTN, check fetch-networks to confirm
+            "recipients": [{"msisdn": phone, "volume_mb": vol_mb}]
+        }
+        print(f"DATAPLAZA CALL {payload}", flush=True)
+        r = requests.post(url, json=payload, headers=headers, timeout=30)
+        print(f"DATAPLAZA FINAL -> {r.status_code} {r.text}", flush=True)
+        return r.status_code in [200,201], r.text
     except Exception as e:
-        print(f"DATAPLAZA error {e}")
+        print(f"DATAPLAZA ERROR {e}", flush=True)
         return False, str(e)
 
 @app.route("/success")
