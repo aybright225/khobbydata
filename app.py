@@ -18,16 +18,16 @@ DATAPLAZA_API_KEY = (os.getenv("DATAPLAZA_API_KEY") or "").strip()
 MTN_NETWORK_ID = int(os.getenv("MTN_NETWORK_ID", "1"))
 
 MTN_BUNDLES = [
-    {"size": "1GB", "price": 4.8, "cap": 1, "valid": "90 days"},
-    {"size": "2GB", "price": 9.7, "cap": 2, "valid": "90 days"},
-    {"size": "3GB", "price": 14.6, "cap": 3, "valid": "90 days"},
-    {"size": "4GB", "price": 19.5, "cap": 4, "valid": "90 days"},
+    {"size": "1GB", "price": 4.7, "cap": 1, "valid": "90 days"},
+    {"size": "2GB", "price": 9.6, "cap": 2, "valid": "90 days"},
+    {"size": "3GB", "price": 14.5, "cap": 3, "valid": "90 days"},
+    {"size": "4GB", "price": 19.4, "cap": 4, "valid": "90 days"},
     {"size": "5GB", "price": 24.0, "cap": 5, "valid": "90 days"},
-    {"size": "6GB", "price": 29.0, "cap": 6, "valid": "90 days"},
-    {"size": "8GB", "price": 39.0, "cap": 8, "valid": "90 days"},
-    {"size": "10GB", "price": 49.5, "cap": 10, "valid": "90 days"},
-    {"size": "15GB", "price": 70.0, "cap": 15, "valid": "90 days"},
-    {"size": "20GB", "price": 95.0, "cap": 20, "valid": "90 days"},
+    {"size": "6GB", "price": 28.5, "cap": 6, "valid": "90 days"},
+    {"size": "8GB", "price": 37.5, "cap": 8, "valid": "90 days"},
+    {"size": "10GB", "price": 47.0, "cap": 10, "valid": "90 days"},
+    {"size": "15GB", "price": 69.5, "cap": 15, "valid": "90 days"},
+    {"size": "20GB", "price": 93.2, "cap": 20, "valid": "90 days"},
 ]
 
 def load_orders():
