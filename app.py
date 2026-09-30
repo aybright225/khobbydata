@@ -128,7 +128,7 @@ def send_dataplaza(phone, gb):
     headers = {"x-api-key": DATAPLAZA_API_KEY, "Content-Type": "application/json"}
     payload = {
         "network_id": MTN_NETWORK_ID,
-        "recipients": [{"msisdn": phone, "volume": int(gb)}]
+        "recipients": [{"msisdn": phone, "volume": int(str(gb).replace("GB","").strip())}]
     }
     try:
         url = f"{DATAPLAZA_BASE}/orders/bulk"
@@ -141,25 +141,39 @@ def send_dataplaza(phone, gb):
 
 @app.route("/success")
 def success():
-    ref = request.args.get("reference", "")
+    ref = request.args.get("reference", "") or request.args.get("trxref", "")
+    print(f"=== SUCCESS HIT ref={ref} ===", flush=True)
+    
     if PAYSTACK_SECRET and ref:
         try:
             headers = {"Authorization": f"Bearer {PAYSTACK_SECRET}"}
             vr = requests.get(f"https://api.paystack.co/transaction/verify/{ref}", headers=headers, timeout=20)
             vj = vr.json()
+            print(f"Paystack verify: {vj}", flush=True)
+            
             if vj.get("status") and vj["data"]["status"] == "success":
                 meta = vj["data"]["metadata"]
                 phone = meta.get("phone", "")
                 capacity = meta.get("capacity", "1")
                 bundle = meta.get("bundle", "1GB")
-                price = vj["data"]["amount"] / 100
-                send_dataplaza(phone, capacity)
+                
+                # Normalize phone to 0xxxxxxxxx
+                if phone.startswith("+233"):
+                    phone = "0" + phone[4:]
+                
+                print(f"Calling DataPlaza phone={phone} cap={capacity} bundle={bundle}", flush=True)
+                ok, resp = send_dataplaza(phone, capacity)
+                print(f"DATAPLAZA FINAL -> ok={ok} resp={resp}", flush=True)
+
                 orders = load_orders()
-                orders.append({"time": datetime.now().isoformat(), "phone": phone, "bundle": bundle, "price": price, "reference": ref})
+                orders.append({"time": datetime.now().isoformat(), "phone": phone, "capacity": capacity, "bundle": bundle, "dataplaza_ok": ok, "dataplaza_resp": str(resp)})
                 save_orders(orders)
+            else:
+                print(f"Paystack NOT success: {vj}", flush=True)
         except Exception as e:
-            print(e)
-    return "<div style='text-align:center;margin-top:80px;font-family:Arial'><h1>✅ Payment Successful</h1><p>Data will be delivered soon</p><a href='/'>Home</a></div>"
+            print(f"SUCCESS ERROR {e}", flush=True)
+            
+    return "<div style='text-align:center;margin-top:80px;font-family:Arial'><h2>Payment successful! Data will arrive shortly.</h2><a href='/'>Go home</a></div>"
 
 @app.route("/paystack/webhook", methods=["POST"])
 def webhook():
