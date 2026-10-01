@@ -44,7 +44,7 @@ def deliver_to_dataplaza(phone, mb, network_id=3):
     if not DATAPLAZA_KEY:
         return {"error": "No DATAPLAZA_API_KEY in Render"}
     
-    headers = {"X-API-Key": DATAPLAZA_KEY, "Content-Type": "application/json"}
+    headers = {"x-api-key": DATAPLAZA_KEY, "Content-Type": "application/json"}
     phone = phone.replace("+233","0").strip()
     if phone.startswith("233"):
         phone = "0" + phone[3:]
@@ -129,7 +129,7 @@ def webhook():
         phone = meta.get("phone","")
         bundle = meta.get("bundle","")
         mb = int(meta.get("mb",1000))
-        network_id = int(meta.get("network_id",1))
+        network_id = int(meta.get("network_id",3))
         
         # 1. Try to deliver via Dataplaza automatically
         plaza_res = deliver_to_dataplaza(phone, mb, network_id)
