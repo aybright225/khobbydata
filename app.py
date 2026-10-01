@@ -171,5 +171,14 @@ def admin():
         rows += f"<tr><td>{o.get('time')}</td><td>{o.get('phone')}</td><td>{o.get('bundle')}</td><td>{o.get('price')}</td><td>{str(o.get('dataplaza_response'))[:80]}</td><td>{o.get('status')}</td></tr>"
     return f"<div style='font-family:Arial;padding:10px'><h3>{len(orders)} Orders GH¢ {total}</h3><table border=1 style='width:100%;font-size:12px;border-collapse:collapse'><tr><th>Time</th><th>Phone</th><th>Bundle</th><th>Price</th><th>Dataplaza</th><th>Status</th></tr>{rows}</table></div>"
 
+@app.route("/test-delivery")
+def test_delivery():
+    if request.args.get("pin") != "5329":
+        return "Add ?pin=5329"
+    phone = request.args.get("phone", "0532738647")  # your number
+    mb = int(request.args.get("mb", "1000"))  # 1GB
+    result = deliver_to_dataplaza(phone, mb, network_id=3)
+    return jsonify({"phone": phone, "mb": mb, "AUTO": AUTO_DELIVERY, "result": result})
+
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=int(os.environ.get("PORT",10000)))
