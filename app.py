@@ -34,20 +34,50 @@ def load_orders():
 def save_orders(o):
     with open(ORDERS_FILE,"w") as f: json.dump(o,f,indent=2)
 
-def deliver_to_dataplaza(phone, mb, network_id=1):
-    """Call Dataplaza bulk order API"""
+DATAPLAZA_BASE = "https://dataplazagh.com/api/v1"
+
+def deliver_to_dataplaza(phone, mb, network_id=3):
     if not DATAPLAZA_KEY:
-        return {"error":"DATAPLAZA_API_KEY not set in Render"}
-    headers = {"x-api-key": DATAPLAZA_KEY, "Content-Type":"application/json"}
-    # Clean phone to 0XXXXXXXXX format
-    phone = phone.replace("+233","0").strip()
-    payload = {
-        "network_id": network_id,  # 3=MTN (we will try 3, if fails try 1)
-        "recipients": [{"msisdn": phone, "volume_mb": mb}]
+        return {"error": "No key in Render"}
+    
+    # Dataplaza wants X-API-Key with capital X
+    headers = {
+        "X-API-Key": DATAPLAZA_KEY,
+        "Content-Type": "application/json",
+        "Accept": "application/json"
     }
+    
+    phone = phone.replace("+233","0").strip()
+    # Must be 10 digits starting with 0
+    if phone.startswith("233"):
+        phone = "0" + phone[3:]
+    
+    payload = {
+        "network_id": network_id,  # 3 = MTN
+        "recipients": [{"msisdn": phone, "volume_mb": int(mb)}]
+    }
+    
     try:
-        r = requests.post(f"{DATAPLAZA_BASE}/orders/bulk", json=payload, headers=headers, timeout=30)
-        return r.json()
+        r = requests.post(f"{DATAPLAZA_BASE}/orders/bulk", 
+                         json=payload, headers=headers, timeout=30)
+        
+        text = r.text
+        print(f"Dataplaza HTTP {r.status_code}: {text[:1000]}")
+        
+        if r.status_code in [200, 201, 202]:
+            if not text or text.strip() == "":
+                return {"success": True, "status_code": r.status_code, "info": "Order accepted (empty body)"}
+            try:
+                return r.json()
+            except:
+                return {"success": True, "raw": text[:1000], "status_code": r.status_code}
+        else:
+            # Error case - try to show real message
+            try:
+                return r.json()
+            except:
+                return {"error": text[:1000], "status_code": r.status_code}
+                
     except Exception as e:
         return {"error": str(e)}
 
