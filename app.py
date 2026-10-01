@@ -42,7 +42,7 @@ def deliver_to_dataplaza(phone, mb, network_id=1):
     # Clean phone to 0XXXXXXXXX format
     phone = phone.replace("+233","0").strip()
     payload = {
-        "network_id": network_id,  # 1=MTN (we will try 1, if fails try 3)
+        "network_id": network_id,  # 3=MTN (we will try 3, if fails try 1)
         "recipients": [{"msisdn": phone, "volume_mb": mb}]
     }
     try:
@@ -99,7 +99,7 @@ def pay():
         "email": f"{phone}@khobbydata.com",
         "amount": int(price*100),
         "currency": "GHS",
-        "metadata": {"phone":phone,"bundle":bundle,"mb":mb,"network_id":1},
+        "metadata": {"phone":phone,"bundle":bundle,"mb":mb,"network_id":3},
         "callback_url": "https://khobbydata.onrender.com/success"
     }
     r = requests.post("https://api.paystack.co/transaction/initialize", json=data, headers=headers, timeout=20)
