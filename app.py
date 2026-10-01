@@ -12,6 +12,7 @@ def get_secret(name1, name2):
 PAYSTACK_SECRET = get_secret("PAYSTACK_SECRET_KEY","PAYSTACK_SECRET")
 DATAPLAZA_KEY = get_secret("DATAPLAZA_API_KEY","DATAPLAZA_KEY")
 DATAPLAZA_BASE = "https://dataplazagh.com/api/v1"
+AUTO_DELIVERY = os.environ.get("AUTO_DELIVERY", "true").lower()== "true"
 
 MTN_BUNDLES = [
     {"size":"1GB","price":4.8,"mb":1000},
@@ -37,47 +38,28 @@ def save_orders(o):
 DATAPLAZA_BASE = "https://dataplazagh.com/api/v1"
 
 def deliver_to_dataplaza(phone, mb, network_id=3):
+    if not AUTO_DELIVERY:
+        return {"info": "Manual mode ON - not calling API"}
+    
     if not DATAPLAZA_KEY:
-        return {"error": "No key in Render"}
+        return {"error": "No DATAPLAZA_API_KEY in Render"}
     
-    # Dataplaza wants X-API-Key with capital X
-    headers = {
-        "X-API-Key": DATAPLAZA_KEY,
-        "Content-Type": "application/json",
-        "Accept": "application/json"
-    }
-    
+    headers = {"X-API-Key": DATAPLAZA_KEY, "Content-Type": "application/json"}
     phone = phone.replace("+233","0").strip()
-    # Must be 10 digits starting with 0
     if phone.startswith("233"):
         phone = "0" + phone[3:]
     
-    payload = {
-        "network_id": network_id,  # 3 = MTN
-        "recipients": [{"msisdn": phone, "volume_mb": int(mb)}]
-    }
+    payload = {"network_id": network_id, "recipients": [{"msisdn": phone, "volume_mb": int(mb)}]}
     
     try:
-        r = requests.post(f"{DATAPLAZA_BASE}/orders/bulk", 
-                         json=payload, headers=headers, timeout=30)
-        
-        text = r.text
-        print(f"Dataplaza HTTP {r.status_code}: {text[:1000]}")
-        
-        if r.status_code in [200, 201, 202]:
-            if not text or text.strip() == "":
-                return {"success": True, "status_code": r.status_code, "info": "Order accepted (empty body)"}
-            try:
-                return r.json()
-            except:
-                return {"success": True, "raw": text[:1000], "status_code": r.status_code}
-        else:
-            # Error case - try to show real message
-            try:
-                return r.json()
-            except:
-                return {"error": text[:1000], "status_code": r.status_code}
-                
+        r = requests.post(f"{DATAPLAZA_BASE}/orders/bulk", json=payload, headers=headers, timeout=30)
+        print(f"Dataplaza {r.status_code}: {r.text[:500]}")
+        if r.status_code in [200,201,202]:
+            return {"success": True, "code": r.status_code, "body": r.text[:500] or "Accepted"}
+        try:
+            return r.json()
+        except:
+            return {"error": r.text[:500], "code": r.status_code}
     except Exception as e:
         return {"error": str(e)}
 
