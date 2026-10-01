@@ -55,6 +55,7 @@ PAGE_HTML = """
 <!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>KhobbyBryt</title><style>
 body{margin:0;background:#f5f5f5;color:#111;font-family:Arial}
+*{box-sizing:border-box}
 .header{background:#fff;padding:12px 16px;display:flex;justify-content:space-between;align-items:center;box-shadow:0 1px 4px rgba(0,0,0,.1);position:sticky;top:0}
 .store{font-weight:900;font-size:18px}
 .badge{background:#ffcc00;padding:4px 10px;border-radius:20px;font-size:11px;font-weight:800}
@@ -64,7 +65,7 @@ body{margin:0;background:#f5f5f5;color:#111;font-family:Arial}
 .size{font-size:34px;font-weight:900;margin-top:6px}
 .price{font-size:22px;font-weight:900;margin-top:8px}
 .valid{float:right;font-size:11px;font-weight:600;margin-top:10px}
-.phone{width:100%;padding:12px;border-radius:10px;border:1.2px solid #000;margin-top:10px}
+.phone{width:100%;padding:12px;border-radius:10px;border:1.2px solid #000;margin-top:10px;display:block}
 .buy{width:100%;background:#000;color:#ffcc00;border:none;padding:12px;border-radius:10px;font-weight:800;margin-top:8px}
 .wa{position:fixed;bottom:16px;right:16px;background:#25D366;color:#fff;width:52px;height:52px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:28px;text-decoration:none}
 </style></head><body>
