@@ -49,10 +49,10 @@ def deliver_to_dataplaza(phone, mb, network_id=3):
     if phone.startswith("233"):
         phone = "0" + phone[3:]
     
-    payload = {"network_id": network_id, "recipients": [{"msisdn": phone, "volume_mb": int(mb)}]}
+    payload = {"network_id": network_id, "msisdn": phone, "volume_mb": int(mb)}
     
     try:
-        r = requests.post(f"{DATAPLAZA_BASE}/orders/bulk", json=payload, headers=headers, timeout=30)
+        r = requests.post(f"{DATAPLAZA_BASE}/orders", json=payload, headers=headers, timeout=30)
         print(f"Dataplaza {r.status_code}: {r.text[:500]}")
         if r.status_code in [200,201,202]:
             return {"success": True, "code": r.status_code, "body": r.text[:500] or "Accepted"}
