@@ -15,16 +15,16 @@ DATAPLAZA_BASE = "https://dataplazagh.com/api/v1"
 AUTO_DELIVERY = os.environ.get("AUTO_DELIVERY", "true").lower()== "true"
 
 MTN_BUNDLES = [
-    {"size":"1GB","price":4.8,"mb":1000},
-    {"size":"2GB","price":9.7,"mb":2000},
-    {"size":"3GB","price":14.6,"mb":3000},
-    {"size":"4GB","price":19.5,"mb":4000},
+    {"size":"1GB","price":4.7,"mb":1000},
+    {"size":"2GB","price":9.6,"mb":2000},
+    {"size":"3GB","price":14.5,"mb":3000},
+    {"size":"4GB","price":19.0,"mb":4000},
     {"size":"5GB","price":24.0,"mb":5000},
     {"size":"6GB","price":29.0,"mb":6000},
     {"size":"8GB","price":39.0,"mb":8000},
     {"size":"10GB","price":49.5,"mb":10000},
-    {"size":"15GB","price":70.0,"mb":15000},
-    {"size":"20GB","price":95.0,"mb":20000},
+    {"size":"15GB","price":69.5,"mb":15000},
+    {"size":"20GB","price":93.0,"mb":20000},
 ]
 
 def load_orders():
